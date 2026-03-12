@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>SMARTGrade v4</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:linear-gradient(135deg,#5f6bdc,#8b5bbf);
+margin:0;
+padding:20px;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:12px;
+}
+
+h1{
+color:#333;
+}
+
+input{
+padding:10px;
+margin:5px;
+}
+
+button{
+padding:10px 15px;
+background:#4b5bdc;
+color:white;
+border:none;
+border-radius:5px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+td,th{
+border:1px solid #ddd;
+padding:10px;
+text-align:center;
+}
+
+.correct{
+background:#c8e6c9;
+}
+
+.wrong{
+background:#ffcdd2;
+}
+
+.totalbox{
+margin-top:15px;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>SMARTGrade Planner</h1>
+
+Student ID
+
+<input id="studentID">
+
+<button onclick="loadStudent()">Load</button>
+
+<button onclick="saveTarget()">Save</button>
+
+<button onclick="clearAll()">Clear</button>
+
+<p>Name: <span id="name"></span></p>
+
+<p>Class: <span id="class"></span></p>
+
+<table>
+
+<tr>
+<th>Assessment</th>
+<th>Max</th>
+<th>Weight</th>
+<th>Target</th>
+<th>Target %</th>
+<th>Actual</th>
+<th>Actual %</th>
+<th>Grade</th>
+</tr>
+
+<tr>
+<td id="assess1"></td>
+<td id="maxA1"></td>
+<td id="perA1"></td>
+<td><input id="targetA1" oninput="calcTarget()"></td>
+<td id="resA1"></td>
+<td id="actualA1"></td>
+<td id="actualPctA1"></td>
+<td id="grade1"></td>
+</tr>
+
+<tr>
+<td id="assess2"></td>
+<td id="maxA2"></td>
+<td id="perA2"></td>
+<td><input id="targetA2" oninput="calcTarget()"></td>
+<td id="resA2"></td>
+<td id="actualA2"></td>
+<td id="actualPctA2"></td>
+<td id="grade2"></td>
+</tr>
+
+<tr>
+<td id="assess3"></td>
+<td id="maxA3"></td>
+<td id="perA3"></td>
+<td><input id="targetA3" oninput="calcTarget()"></td>
+<td id="resA3"></td>
+<td id="actualA3"></td>
+<td id="actualPctA3"></td>
+<td id="grade3"></td>
+</tr>
+
+<tr>
+<td id="assess4"></td>
+<td id="maxA4"></td>
+<td id="perA4"></td>
+<td><input id="targetA4" oninput="calcTarget()"></td>
+<td id="resA4"></td>
+<td id="actualA4"></td>
+<td id="actualPctA4"></td>
+<td id="grade4"></td>
+</tr>
+
+</table>
+
+<div class="totalbox">
+
+Total Target Marks:
+<span id="totalTarget">0</span>
+
+</div>
+
+<div class="totalbox">
+
+Total Actual Marks:
+<span id="totalActual">0</span>
+
+</div>
+
+<div class="totalbox">
+
+Final Predicted Grade:
+<span id="finalGrade">-</span>
+
+</div>
+
+<div class="totalbox">
+
+AI Risk Level:
+<span id="riskLevel">-</span>
+
+</div>
+
+<canvas id="performanceChart"></canvas>
+
+</div>
+
+<script>
+
+var url="https://script.google.com/macros/s/AKfycbxGy-1okvaWL30occ2Ayga-sVrPIiyxu4_vVYXqwc1NSYN02hFcyER-Igv4oFRRc_7A0g/exec";
+
+function getGrade(p){
+
+if(p>=90) return "A+";
+if(p>=80) return "A";
+if(p>=75) return "A-";
+if(p>=70) return "B+";
+if(p>=65) return "B";
+if(p>=60) return "B-";
+if(p>=55) return "C+";
+if(p>=50) return "C";
+if(p>=45) return "C-";
+
+return "F";
+
+}
+
+function detectRisk(percent){
+
+if(percent>=70){
+
+document.getElementById("riskLevel").innerText="SAFE";
+
+}
+
+else if(percent>=50){
+
+document.getElementById("riskLevel").innerText="MODERATE RISK";
+
+}
+
+else{
+
+document.getElementById("riskLevel").innerText="HIGH RISK";
+
+}
+
+}
+
+function calcTarget(){
+
+let totalTarget=0;
+
+for(let i=1;i<=4;i++){
+
+let target=parseFloat(document.getElementById("targetA"+i).value)||0;
+
+let max=parseFloat(document.getElementById("maxA"+i).innerText)||1;
+
+let weight=parseFloat(document.getElementById("perA"+i).innerText)||0;
+
+let pct=(target/max)*weight;
+
+document.getElementById("resA"+i).innerText=pct.toFixed(2);
+
+totalTarget+=target;
+
+}
+
+document.getElementById("totalTarget").innerText=totalTarget;
+
+calcActual();
+
+}
+
+function calcActual(){
+
+let totalActual=0;
+let totalPct=0;
+
+for(let i=1;i<=4;i++){
+
+let actual=parseFloat(document.getElementById("actualA"+i).innerText)||0;
+
+let max=parseFloat(document.getElementById("maxA"+i).innerText)||1;
+
+let weight=parseFloat(document.getElementById("perA"+i).innerText)||0;
+
+let pct=(actual/max)*weight;
+
+document.getElementById("actualPctA"+i).innerText=pct.toFixed(2);
+
+document.getElementById("grade"+i).innerText=getGrade(pct*100);
+
+totalActual+=actual;
+totalPct+=pct;
+
+}
+
+document.getElementById("totalActual").innerText=totalActual;
+
+let finalPercent=totalPct*100;
+
+document.getElementById("finalGrade").innerText=getGrade(finalPercent);
+
+detectRisk(finalPercent);
+
+}
+
+function loadStudent(){
+
+let id=document.getElementById("studentID").value;
+
+fetch(url+"?id="+id)
+
+.then(res=>res.json())
+
+.then(data=>{
+
+if(data.length==0){
+
+alert("ID not found");
+
+return;
+
+}
+
+document.getElementById("class").innerText=data[0];
+document.getElementById("name").innerText=data[2];
+
+let assess=[3,8,13,18];
+let max=[5,10,15,20];
+let weight=[6,11,16,21];
+let actual=[7,12,17,22];
+let target=[4,9,14,19];
+
+for(let i=1;i<=4;i++){
+
+document.getElementById("assess"+i).innerText=data[assess[i-1]];
+document.getElementById("maxA"+i).innerText=data[max[i-1]];
+document.getElementById("perA"+i).innerText=data[weight[i-1]];
+document.getElementById("actualA"+i).innerText=data[actual[i-1]];
+document.getElementById("targetA"+i).value=data[target[i-1]];
+
+}
+
+calcTarget();
+
+});
+
+}
+
+function saveTarget(){
+
+let payload={
+
+id:document.getElementById("studentID").value,
+targetA1:document.getElementById("targetA1").value,
+targetA2:document.getElementById("targetA2").value,
+targetA3:document.getElementById("targetA3").value,
+targetA4:document.getElementById("targetA4").value
+
+};
+
+fetch(url,{
+method:"POST",
+body:JSON.stringify(payload)
+});
+
+}
+
+function clearAll(){
+
+location.reload();
+
+}
+
+</script>
+
+</body>
+
+</html>
