@@ -111,7 +111,7 @@ button {
 </div>
 
 <script>
-var url="https://script.google.com/macros/s/AKfycbzs01_kL-acDTFlDjRqXbLhzS_NCX3Tm4djmeu5gK1YnZ80EoyvQiTuBG4X455glhTbLw/exec";
+var url="https://script.google.com/macros/s/AKfycbzKI_9hpgxMu2wI2M58i7pGQcznWnHkOSDOEuGwAdGen3b-TIjnD5lUyYT-YCq-zOvV6g/exec";
 
 function getGrade(p){
   if(p>=90) return "A+";
@@ -157,11 +157,8 @@ function calcActual(){
     let target=parseFloat(document.getElementById("targetA"+i).value)||0;
     let max=parseFloat(document.getElementById("maxA"+i).innerText)||0;
     let weight=parseFloat(document.getElementById("weightA"+i).innerText)||0;
-
     let pct=(actual/max)*weight;
     document.getElementById("actualPctA"+i).innerText=pct.toFixed(2);
-
-    // Auto color
     if(actual >= target) document.getElementById("actualA"+i).parentNode.className="correct";
     else document.getElementById("actualA"+i).parentNode.className="wrong";
 
@@ -175,9 +172,9 @@ function calcActual(){
   document.getElementById("finalGrade").innerText=getGrade(finalPercent);
   detectRisk(finalPercent);
 
-  // PBPA Status
+  // PBPA Status: exclude Assignment 4
   let allMax=0;
-  for(let i=1;i<=4;i++) allMax+=parseFloat(document.getElementById("maxA"+i).innerText)||0;
+  for(let i=1;i<=3;i++) allMax+=parseFloat(document.getElementById("maxA"+i).innerText)||0;
   let passMark=0.45*allMax;
   let pbpa=document.getElementById("pbpaStatus");
   if(totalActual>=passMark){
