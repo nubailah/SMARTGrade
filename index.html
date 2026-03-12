@@ -1,59 +1,18 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <title>SMARTGrade</title>
-
 <style>
-
-body{
-font-family:Arial;
-background:#f4f6fb;
-padding:20px;
-}
-
-.container{
-max-width:1100px;
-margin:auto;
-background:white;
-padding:25px;
-border-radius:10px;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
-}
-
-td,th{
-border:1px solid #ddd;
-padding:10px;
-text-align:center;
-}
-
-input{
-width:80px;
-padding:5px;
-}
-
-button{
-padding:10px 15px;
-margin-top:10px;
-}
-
-.totalbox{
-margin-top:15px;
-font-weight:bold;
-}
-
+body{font-family:Arial;background:#f4f6fb;padding:20px;}
+.container{max-width:1100px;margin:auto;background:white;padding:25px;border-radius:10px;}
+table{width:100%;border-collapse:collapse;margin-top:20px;}
+td,th{border:1px solid #ddd;padding:10px;text-align:center;}
+input{width:80px;padding:5px;}
+button{padding:10px 15px;margin-top:10px;margin-right:5px;}
+.totalbox{margin-top:15px;font-weight:bold;}
 </style>
-
 </head>
-
 <body>
 
 <div class="container">
@@ -62,7 +21,6 @@ font-weight:bold;
 
 Student ID
 <input id="studentID">
-
 <button onclick="loadStudent()">Load</button>
 <button onclick="saveTarget()">Save</button>
 <button onclick="clearAll()">Clear</button>
@@ -71,7 +29,6 @@ Student ID
 <p>Class: <span id="class"></span></p>
 
 <table>
-
 <tr>
 <th>Assessment</th>
 <th>Max</th>
@@ -86,7 +43,7 @@ Student ID
 <td id="assess1"></td>
 <td id="maxA1"></td>
 <td id="weightA1"></td>
-<td><input id="targetA1" oninput="calcTarget()"></td>
+<td><input id="targetA1" oninput="calcAll()"></td>
 <td id="targetPctA1"></td>
 <td id="actualA1"></td>
 <td id="actualPctA1"></td>
@@ -96,7 +53,7 @@ Student ID
 <td id="assess2"></td>
 <td id="maxA2"></td>
 <td id="weightA2"></td>
-<td><input id="targetA2" oninput="calcTarget()"></td>
+<td><input id="targetA2" oninput="calcAll()"></td>
 <td id="targetPctA2"></td>
 <td id="actualA2"></td>
 <td id="actualPctA2"></td>
@@ -106,7 +63,7 @@ Student ID
 <td id="assess3"></td>
 <td id="maxA3"></td>
 <td id="weightA3"></td>
-<td><input id="targetA3" oninput="calcTarget()"></td>
+<td><input id="targetA3" oninput="calcAll()"></td>
 <td id="targetPctA3"></td>
 <td id="actualA3"></td>
 <td id="actualPctA3"></td>
@@ -116,13 +73,16 @@ Student ID
 <td id="assess4"></td>
 <td id="maxA4"></td>
 <td id="weightA4"></td>
-<td><input id="targetA4" oninput="calcTarget()"></td>
+<td><input id="targetA4" oninput="calcAll()"></td>
 <td id="targetPctA4"></td>
 <td id="actualA4"></td>
 <td id="actualPctA4"></td>
 </tr>
-
 </table>
+
+<div class="totalbox">
+Total Target Marks: <span id="totalTargetMarks">0</span>
+</div>
 
 <div class="totalbox">
 Total Actual Marks: <span id="totalActual">0</span>
@@ -147,192 +107,129 @@ PBPA Status: <span id="pbpaStatus">-</span>
 </div>
 
 <script>
-
-var url="https://script.google.com/macros/s/AKfycbylhPHcwADMaotuEuVrNtcHhXTXoNZDPMP3QKZAhv5Wis6-7Do2XskH7Jv8K7VKJYnoQw/exec";
+var url="https://script.google.com/macros/s/AKfycbx95wrZWJikIIgoDP86P1gO8m1iMUqoHRiGhhdlhGdl/dev";
 
 function getGrade(p){
-
-if(p>=90) return "A+";
-if(p>=80) return "A";
-if(p>=75) return "A-";
-if(p>=70) return "B+";
-if(p>=65) return "B";
-if(p>=60) return "B-";
-if(p>=55) return "C+";
-if(p>=50) return "C";
-if(p>=45) return "C-";
-return "F";
-
+  if(p>=90) return "A+";
+  if(p>=80) return "A";
+  if(p>=75) return "A-";
+  if(p>=70) return "B+";
+  if(p>=65) return "B";
+  if(p>=60) return "B-";
+  if(p>=55) return "C+";
+  if(p>=50) return "C";
+  if(p>=45) return "C-";
+  return "F";
 }
 
 function detectRisk(p){
-
-if(p>=70) document.getElementById("riskLevel").innerText="SAFE";
-else if(p>=50) document.getElementById("riskLevel").innerText="MODERATE RISK";
-else document.getElementById("riskLevel").innerText="HIGH RISK";
-
+  if(p>=70) document.getElementById("riskLevel").innerText="SAFE";
+  else if(p>=50) document.getElementById("riskLevel").innerText="MODERATE RISK";
+  else document.getElementById("riskLevel").innerText="HIGH RISK";
 }
 
-function calcTarget(){
+function calcAll(){
+  // Target %
+  let totalTarget=0;
+  for(let i=1;i<=4;i++){
+    let target=parseFloat(document.getElementById("targetA"+i).value)||0;
+    let max=parseFloat(document.getElementById("maxA"+i).innerText)||1;
+    let weight=parseFloat(document.getElementById("weightA"+i).innerText)||0;
+    let pct=(target/max)*weight;
+    document.getElementById("targetPctA"+i).innerText=pct.toFixed(2);
+    totalTarget+=target;
+  }
+  document.getElementById("totalTargetMarks").innerText=totalTarget.toFixed(2);
 
-for(let i=1;i<=4;i++){
+  // Actual %
+  let totalActual=0;
+  let totalMaxUsed=0;
+  let totalMaxAll=0;
+  for(let i=1;i<=4;i++){
+    let actual=parseFloat(document.getElementById("actualA"+i).innerText)||0;
+    let max=parseFloat(document.getElementById("maxA"+i).innerText)||1;
+    let weight=parseFloat(document.getElementById("weightA"+i).innerText)||0;
 
-let target=parseFloat(document.getElementById("targetA"+i).value)||0;
-let max=parseFloat(document.getElementById("maxA"+i).innerText)||1;
-let weight=parseFloat(document.getElementById("weightA"+i).innerText)||0;
+    if(!isNaN(max)) totalMaxAll+=max;
 
-let pct=(target/max)*weight;
+    if(actual>0){
+      let pct=(actual/max)*weight;
+      document.getElementById("actualPctA"+i).innerText=pct.toFixed(2);
+      totalActual+=actual;
+      totalMaxUsed+=max;
+    } else {
+      document.getElementById("actualPctA"+i).innerText="";
+    }
+  }
 
-document.getElementById("targetPctA"+i).innerText=pct.toFixed(2);
+  document.getElementById("totalActual").innerText=totalActual;
 
-}
+  if(totalMaxUsed>0){
+    let finalPercent=(totalActual/totalMaxUsed)*100;
+    document.getElementById("finalPercent").innerText=finalPercent.toFixed(2);
+    document.getElementById("finalGrade").innerText=getGrade(finalPercent);
+    detectRisk(finalPercent);
+  }
 
-calcActual();
-
-}
-
-function calcActual(){
-
-let totalActual=0;
-let totalMaxUsed=0;
-let totalMaxAll=0;
-
-for(let i=1;i<=4;i++){
-
-let actual=parseFloat(document.getElementById("actualA"+i).innerText);
-let max=parseFloat(document.getElementById("maxA"+i).innerText);
-let weight=parseFloat(document.getElementById("weightA"+i).innerText);
-
-if(!isNaN(max)) totalMaxAll+=max;
-
-if(!isNaN(actual) && actual>0){
-
-let pct=(actual/max)*weight;
-
-document.getElementById("actualPctA"+i).innerText=pct.toFixed(2);
-
-totalActual+=actual;
-totalMaxUsed+=max;
-
-}
-else{
-
-document.getElementById("actualPctA"+i).innerText="";
-
-}
-
-}
-
-document.getElementById("totalActual").innerText=totalActual;
-
-if(totalMaxUsed>0){
-
-let finalPercent=(totalActual/totalMaxUsed)*100;
-
-document.getElementById("finalPercent").innerText=finalPercent.toFixed(2);
-
-document.getElementById("finalGrade").innerText=getGrade(finalPercent);
-
-detectRisk(finalPercent);
-
-}
-
-checkPBPA(totalActual,totalMaxAll);
-
+  checkPBPA(totalActual,totalMaxAll);
 }
 
 function checkPBPA(actual,totalMax){
-
-let passmark=0.45*totalMax;
-
-if(actual>=passmark){
-
-document.getElementById("pbpaStatus").innerText=
-"PASS PBPA - TOTAL ACTUAL MARK >= "+passmark.toFixed(2);
-
-document.getElementById("pbpaStatus").style.color="green";
-
-}
-else{
-
-document.getElementById("pbpaStatus").innerText=
-"FAIL PBPA - TOTAL ACTUAL MARK < "+passmark.toFixed(2);
-
-document.getElementById("pbpaStatus").style.color="red";
-
-}
-
+  let passmark=0.45*totalMax;
+  if(actual>=passmark){
+    document.getElementById("pbpaStatus").innerText=
+    "PASS PBPA - TOTAL ACTUAL MARK >= "+passmark.toFixed(2);
+    document.getElementById("pbpaStatus").style.color="green";
+  } else {
+    document.getElementById("pbpaStatus").innerText=
+    "FAIL PBPA - TOTAL ACTUAL MARK < "+passmark.toFixed(2);
+    document.getElementById("pbpaStatus").style.color="red";
+  }
 }
 
 function loadStudent(){
+  let id=document.getElementById("studentID").value;
+  fetch(url+"?id="+id)
+  .then(res=>res.json())
+  .then(data=>{
+    if(data.length==0){ alert("ID not found"); return; }
 
-let id=document.getElementById("studentID").value;
+    document.getElementById("class").innerText=data[0];
+    document.getElementById("name").innerText=data[2];
 
-fetch(url+"?id="+id)
+    let assess=[3,8,13,18];
+    let target=[4,9,14,19];
+    let max=[5,10,15,20];
+    let weight=[6,11,16,21];
+    let actual=[7,12,17,22];
 
-.then(res=>res.json())
+    for(let i=1;i<=4;i++){
+      document.getElementById("assess"+i).innerText=data[assess[i-1]];
+      document.getElementById("maxA"+i).innerText=data[max[i-1]];
+      document.getElementById("weightA"+i).innerText=data[weight[i-1]];
+      document.getElementById("actualA"+i).innerText=data[actual[i-1]];
+      document.getElementById("targetA"+i).value=data[target[i-1]];
+    }
 
-.then(data=>{
-
-if(data.length==0){
-
-alert("ID not found");
-
-return;
-
-}
-
-document.getElementById("class").innerText=data[0];
-document.getElementById("name").innerText=data[2];
-
-let assess=[3,8,13,18];
-let target=[4,9,14,19];
-let max=[5,10,15,20];
-let weight=[6,11,16,21];
-let actual=[7,12,17,22];
-
-for(let i=1;i<=4;i++){
-
-document.getElementById("assess"+i).innerText=data[assess[i-1]];
-document.getElementById("maxA"+i).innerText=data[max[i-1]];
-document.getElementById("weightA"+i).innerText=data[weight[i-1]];
-document.getElementById("actualA"+i).innerText=data[actual[i-1]];
-document.getElementById("targetA"+i).value=data[target[i-1]];
-
-}
-
-calcTarget();
-
-});
-
+    calcAll();
+  });
 }
 
 function saveTarget(){
-
-let payload={
-
-id:document.getElementById("studentID").value,
-target1:document.getElementById("targetA1").value,
-target2:document.getElementById("targetA2").value,
-target3:document.getElementById("targetA3").value,
-target4:document.getElementById("targetA4").value
-
-};
-
-fetch(url,{
-method:"POST",
-body:JSON.stringify(payload)
-});
-
+  let payload={
+    id:document.getElementById("studentID").value,
+    target1:document.getElementById("targetA1").value,
+    target2:document.getElementById("targetA2").value,
+    target3:document.getElementById("targetA3").value,
+    target4:document.getElementById("targetA4").value
+  };
+  fetch(url,{
+    method:"POST",
+    body:JSON.stringify(payload)
+  });
 }
 
-function clearAll(){
-
-location.reload();
-
-}
-
+function clearAll(){ location.reload(); }
 </script>
-
 </body>
 </html>
