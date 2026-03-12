@@ -154,7 +154,7 @@ function detectRisk(p){
 }
 
 function calcAll(){
-  let totalActual=0,totalMaxActual=0,totalTarget=0,totalMaxTarget=0;
+  let totalActual=0, totalMaxAll=0, totalTarget=0;
 
   for(let i=1;i<=4;i++){
     let target=parseFloat(document.getElementById("targetA"+i).value)||0;
@@ -176,24 +176,30 @@ function calcAll(){
 
     // Summations
     totalTarget+=target;
-    totalMaxTarget+=max;
-    if(actual>0){
-      totalActual+=actual;
-      totalMaxActual+=max;
-    }
+    totalActual+=actual;
+    totalMaxAll+=max; // SUM ALL max, regardless of actual value
   }
 
   document.getElementById("totalTarget").innerText=totalTarget.toFixed(2);
   document.getElementById("totalActual").innerText=totalActual.toFixed(2);
 
-  let finalPercent=(totalActual/totalMaxActual)*100||0;
+  // Final %
+  let filledMax=0;
+  for(let i=1;i<=4;i++){
+    let actual=parseFloat(document.getElementById("actualA"+i).innerText)||0;
+    let max=parseFloat(document.getElementById("maxA"+i).innerText)||0;
+    if(actual>0) filledMax+=max;
+  }
+  let finalPercent=(filledMax>0)?(totalActual/filledMax)*100:0;
   document.getElementById("finalPercent").innerText=finalPercent.toFixed(2);
+
+  // Predicted Grade & Risk
   document.getElementById("finalGrade").innerText=getGrade(finalPercent);
   detectRisk(finalPercent);
 
-  // PBPA Status
-  let passMark=0.45*(totalMaxActual>0?totalMaxActual:1);
-  if(totalActual>=passMark){
+  // PBPA Status -> 45% of TOTAL MAX ALL
+  let passMark = 0.45 * totalMaxAll;
+  if(totalActual >= passMark){
     document.getElementById("pbpaStatus").innerText="PASS PBPA - TOTAL ACTUAL MARK >= "+passMark.toFixed(2);
     document.getElementById("pbpaStatus").style.color="green";
   }else{
@@ -202,10 +208,10 @@ function calcAll(){
   }
 
   // Pass probability
-  let passProb=(passMark-totalActual)/passMark*100;
-  passProb=Math.max(0,Math.min(100,passProb));
-  document.getElementById("failProbBar").style.width=(100-passProb)+"%";
-  document.getElementById("failProbBar").innerText=(100-passProb).toFixed(0)+"%";
+  let passProb = (passMark - totalActual)/passMark*100;
+  passProb = Math.max(0,Math.min(100,passProb));
+  document.getElementById("failProbBar").style.width = (100-passProb)+"%";
+  document.getElementById("failProbBar").innerText = (100-passProb).toFixed(0)+"%";
 }
 
 function loadStudent(){
