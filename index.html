@@ -216,7 +216,7 @@ let actual=parseFloat(document.getElementById("actualA"+i).innerText)||0;
 
 let max=parseFloat(document.getElementById("maxA"+i).innerText)||1;
 
-let pct=(actual/max)*100;
+let pct=(actual/max)*weight;
 
 document.getElementById("actualPctA"+i).innerText=pct.toFixed(2);
 
