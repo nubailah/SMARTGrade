@@ -5,18 +5,18 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>SMARTGrade Planner</title>
+<title>SMARTGrade</title>
 
 <style>
 
 body{
 font-family:Arial;
-background:#f5f6fa;
+background:#f4f6fb;
 padding:20px;
 }
 
 .container{
-max-width:1000px;
+max-width:1100px;
 margin:auto;
 background:white;
 padding:25px;
@@ -29,14 +29,14 @@ border-collapse:collapse;
 margin-top:20px;
 }
 
-th,td{
+td,th{
 border:1px solid #ddd;
 padding:10px;
 text-align:center;
 }
 
 input{
-width:70px;
+width:80px;
 padding:5px;
 }
 
@@ -58,20 +58,16 @@ font-weight:bold;
 
 <div class="container">
 
-<h2>SMARTGrade Student Planner</h2>
+<h2>Student Planner</h2>
 
 Student ID
-
 <input id="studentID">
 
 <button onclick="loadStudent()">Load</button>
-
 <button onclick="saveTarget()">Save</button>
-
 <button onclick="clearAll()">Clear</button>
 
 <p>Name: <span id="name"></span></p>
-
 <p>Class: <span id="class"></span></p>
 
 <table>
@@ -79,6 +75,7 @@ Student ID
 <tr>
 <th>Assessment</th>
 <th>Max</th>
+<th>Weight</th>
 <th>Target</th>
 <th>Target %</th>
 <th>Actual</th>
@@ -87,38 +84,42 @@ Student ID
 
 <tr>
 <td id="assess1"></td>
-<td id="max1"></td>
-<td><input id="target1" oninput="calcTarget()"></td>
-<td id="targetPct1"></td>
-<td id="actual1"></td>
-<td id="actualPct1"></td>
+<td id="maxA1"></td>
+<td id="weightA1"></td>
+<td><input id="targetA1" oninput="calcTarget()"></td>
+<td id="targetPctA1"></td>
+<td id="actualA1"></td>
+<td id="actualPctA1"></td>
 </tr>
 
 <tr>
 <td id="assess2"></td>
-<td id="max2"></td>
-<td><input id="target2" oninput="calcTarget()"></td>
-<td id="targetPct2"></td>
-<td id="actual2"></td>
-<td id="actualPct2"></td>
+<td id="maxA2"></td>
+<td id="weightA2"></td>
+<td><input id="targetA2" oninput="calcTarget()"></td>
+<td id="targetPctA2"></td>
+<td id="actualA2"></td>
+<td id="actualPctA2"></td>
 </tr>
 
 <tr>
 <td id="assess3"></td>
-<td id="max3"></td>
-<td><input id="target3" oninput="calcTarget()"></td>
-<td id="targetPct3"></td>
-<td id="actual3"></td>
-<td id="actualPct3"></td>
+<td id="maxA3"></td>
+<td id="weightA3"></td>
+<td><input id="targetA3" oninput="calcTarget()"></td>
+<td id="targetPctA3"></td>
+<td id="actualA3"></td>
+<td id="actualPctA3"></td>
 </tr>
 
 <tr>
 <td id="assess4"></td>
-<td id="max4"></td>
-<td><input id="target4" oninput="calcTarget()"></td>
-<td id="targetPct4"></td>
-<td id="actual4"></td>
-<td id="actualPct4"></td>
+<td id="maxA4"></td>
+<td id="weightA4"></td>
+<td><input id="targetA4" oninput="calcTarget()"></td>
+<td id="targetPctA4"></td>
+<td id="actualA4"></td>
+<td id="actualPctA4"></td>
 </tr>
 
 </table>
@@ -147,7 +148,7 @@ PBPA Status: <span id="pbpaStatus">-</span>
 
 <script>
 
-var url="https://script.google.com/macros/s/AKfycbwYeABZKhid1AO4XLD8V2hGIfI2Tle79vasdDxgrK3vEcFyEHFD-1PSA-5GyZw6VFW9bg/exec";
+var url="https://script.google.com/macros/s/AKfycbylhPHcwADMaotuEuVrNtcHhXTXoNZDPMP3QKZAhv5Wis6-7Do2XskH7Jv8K7VKJYnoQw/exec";
 
 function getGrade(p){
 
@@ -166,23 +167,9 @@ return "F";
 
 function detectRisk(p){
 
-if(p>=70){
-
-document.getElementById("riskLevel").innerText="SAFE";
-
-}
-
-else if(p>=50){
-
-document.getElementById("riskLevel").innerText="MODERATE RISK";
-
-}
-
-else{
-
-document.getElementById("riskLevel").innerText="HIGH RISK";
-
-}
+if(p>=70) document.getElementById("riskLevel").innerText="SAFE";
+else if(p>=50) document.getElementById("riskLevel").innerText="MODERATE RISK";
+else document.getElementById("riskLevel").innerText="HIGH RISK";
 
 }
 
@@ -190,13 +177,13 @@ function calcTarget(){
 
 for(let i=1;i<=4;i++){
 
-let target=parseFloat(document.getElementById("target"+i).value)||0;
+let target=parseFloat(document.getElementById("targetA"+i).value)||0;
+let max=parseFloat(document.getElementById("maxA"+i).innerText)||1;
+let weight=parseFloat(document.getElementById("weightA"+i).innerText)||0;
 
-let max=parseFloat(document.getElementById("max"+i).innerText)||1;
+let pct=(target/max)*weight;
 
-let pct=(target/max)*100;
-
-document.getElementById("targetPct"+i).innerText=pct.toFixed(2);
+document.getElementById("targetPctA"+i).innerText=pct.toFixed(2);
 
 }
 
@@ -207,28 +194,30 @@ calcActual();
 function calcActual(){
 
 let totalActual=0;
-let totalMax=0;
+let totalMaxUsed=0;
+let totalMaxAll=0;
 
 for(let i=1;i<=4;i++){
 
-let actual=parseFloat(document.getElementById("actual"+i).innerText);
+let actual=parseFloat(document.getElementById("actualA"+i).innerText);
+let max=parseFloat(document.getElementById("maxA"+i).innerText);
+let weight=parseFloat(document.getElementById("weightA"+i).innerText);
 
-let max=parseFloat(document.getElementById("max"+i).innerText);
+if(!isNaN(max)) totalMaxAll+=max;
 
 if(!isNaN(actual) && actual>0){
 
-let pct=(actual/max)*100;
+let pct=(actual/max)*weight;
 
-document.getElementById("actualPct"+i).innerText=pct.toFixed(2);
+document.getElementById("actualPctA"+i).innerText=pct.toFixed(2);
 
 totalActual+=actual;
-totalMax+=max;
+totalMaxUsed+=max;
 
 }
-
 else{
 
-document.getElementById("actualPct"+i).innerText="";
+document.getElementById("actualPctA"+i).innerText="";
 
 }
 
@@ -236,9 +225,9 @@ document.getElementById("actualPct"+i).innerText="";
 
 document.getElementById("totalActual").innerText=totalActual;
 
-if(totalMax>0){
+if(totalMaxUsed>0){
 
-let finalPercent=(totalActual/totalMax)*100;
+let finalPercent=(totalActual/totalMaxUsed)*100;
 
 document.getElementById("finalPercent").innerText=finalPercent.toFixed(2);
 
@@ -246,35 +235,32 @@ document.getElementById("finalGrade").innerText=getGrade(finalPercent);
 
 detectRisk(finalPercent);
 
-checkPBPA(totalActual,totalMax);
+}
+
+checkPBPA(totalActual,totalMaxAll);
 
 }
 
-}
+function checkPBPA(actual,totalMax){
 
-function checkPBPA(actual,max){
-
-let passmark=0.45*max;
-
-let msg="";
+let passmark=0.45*totalMax;
 
 if(actual>=passmark){
 
-msg="PASS PBPA - TOTAL ACTUAL MARK >= "+passmark.toFixed(2);
+document.getElementById("pbpaStatus").innerText=
+"PASS PBPA - TOTAL ACTUAL MARK >= "+passmark.toFixed(2);
 
 document.getElementById("pbpaStatus").style.color="green";
 
 }
-
 else{
 
-msg="FAIL PBPA - TOTAL ACTUAL MARK < "+passmark.toFixed(2);
+document.getElementById("pbpaStatus").innerText=
+"FAIL PBPA - TOTAL ACTUAL MARK < "+passmark.toFixed(2);
 
 document.getElementById("pbpaStatus").style.color="red";
 
 }
-
-document.getElementById("pbpaStatus").innerText=msg;
 
 }
 
@@ -290,8 +276,6 @@ fetch(url+"?id="+id)
 
 if(data.length==0){
 
-clearAll();
-
 alert("ID not found");
 
 return;
@@ -301,17 +285,19 @@ return;
 document.getElementById("class").innerText=data[0];
 document.getElementById("name").innerText=data[2];
 
-let assess=[3,7,11,15];
-let target=[4,8,12,16];
-let max=[5,9,13,17];
-let actual=[6,10,14,18];
+let assess=[3,8,13,18];
+let target=[4,9,14,19];
+let max=[5,10,15,20];
+let weight=[6,11,16,21];
+let actual=[7,12,17,22];
 
 for(let i=1;i<=4;i++){
 
 document.getElementById("assess"+i).innerText=data[assess[i-1]];
-document.getElementById("max"+i).innerText=data[max[i-1]];
-document.getElementById("actual"+i).innerText=data[actual[i-1]];
-document.getElementById("target"+i).value=data[target[i-1]];
+document.getElementById("maxA"+i).innerText=data[max[i-1]];
+document.getElementById("weightA"+i).innerText=data[weight[i-1]];
+document.getElementById("actualA"+i).innerText=data[actual[i-1]];
+document.getElementById("targetA"+i).value=data[target[i-1]];
 
 }
 
@@ -326,10 +312,10 @@ function saveTarget(){
 let payload={
 
 id:document.getElementById("studentID").value,
-target1:document.getElementById("target1").value,
-target2:document.getElementById("target2").value,
-target3:document.getElementById("target3").value,
-target4:document.getElementById("target4").value
+target1:document.getElementById("targetA1").value,
+target2:document.getElementById("targetA2").value,
+target3:document.getElementById("targetA3").value,
+target4:document.getElementById("targetA4").value
 
 };
 
