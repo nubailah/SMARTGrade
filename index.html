@@ -2,109 +2,188 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SMARTGrade</title>
+<title>SMARTGrade Planner</title>
 <style>
-body{font-family:Arial;background:#f4f6fb;padding:20px;}
-.container{max-width:1100px;margin:auto;background:white;padding:25px;border-radius:10px;}
-table{width:100%;border-collapse:collapse;margin-top:20px;}
-td,th{border:1px solid #ddd;padding:10px;text-align:center;}
-input{width:80px;padding:5px;}
-button{padding:10px 15px;margin-top:10px;margin-right:5px;}
-.totalbox{margin-top:15px;font-weight:bold;}
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f2f7;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: linear-gradient(135deg, #5f6bdc, #8b5bbf);
+  color: white;
+  padding: 20px;
+  text-align: center;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2em;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 30px auto;
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+}
+
+th {
+  background-color: #f3f4f7;
+  font-weight: 600;
+}
+
+input {
+  width: 80px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 10px 16px;
+  margin: 5px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #5f6bdc, #8b5bbf);
+  color: white;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.totalbox {
+  margin-top: 15px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.correct {
+  background-color: #c8e6c9;
+  font-weight: bold;
+}
+
+.wrong {
+  background-color: #ffcdd2;
+  font-weight: bold;
+}
+
+.progress-bar {
+  height: 20px;
+  border-radius: 10px;
+  background-color: #eee;
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #5f6bdc, #8b5bbf);
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  transition: width 0.5s ease;
+}
 </style>
 </head>
 <body>
 
+<header>
+  <h1>SMARTGrade Planner</h1>
+  <p>Student Target vs Actual Assessment Analyzer</p>
+</header>
+
 <div class="container">
+  <h2>Student Planner</h2>
 
-<h2>Student Planner</h2>
+  <label>Student ID: </label>
+  <input id="studentID">
+  <button onclick="loadStudent()">Load</button>
+  <button onclick="saveTarget()">Save</button>
+  <button onclick="clearAll()">Clear</button>
 
-Student ID
-<input id="studentID">
-<button onclick="loadStudent()">Load</button>
-<button onclick="saveTarget()">Save</button>
-<button onclick="clearAll()">Clear</button>
+  <p>Name: <span id="name"></span></p>
+  <p>Class: <span id="class"></span></p>
 
-<p>Name: <span id="name"></span></p>
-<p>Class: <span id="class"></span></p>
+  <table>
+    <tr>
+      <th>Assessment</th><th>Max</th><th>Weight</th><th>Target</th><th>Target %</th>
+      <th>Actual</th><th>Actual %</th>
+    </tr>
+    <tr>
+      <td id="assess1"></td><td id="maxA1"></td><td id="weightA1"></td>
+      <td><input id="targetA1" oninput="calcAll()"></td>
+      <td id="targetPctA1"></td><td id="actualA1"></td><td id="actualPctA1"></td>
+    </tr>
+    <tr>
+      <td id="assess2"></td><td id="maxA2"></td><td id="weightA2"></td>
+      <td><input id="targetA2" oninput="calcAll()"></td>
+      <td id="targetPctA2"></td><td id="actualA2"></td><td id="actualPctA2"></td>
+    </tr>
+    <tr>
+      <td id="assess3"></td><td id="maxA3"></td><td id="weightA3"></td>
+      <td><input id="targetA3" oninput="calcAll()"></td>
+      <td id="targetPctA3"></td><td id="actualA3"></td><td id="actualPctA3"></td>
+    </tr>
+    <tr>
+      <td id="assess4"></td><td id="maxA4"></td><td id="weightA4"></td>
+      <td><input id="targetA4" oninput="calcAll()"></td>
+      <td id="targetPctA4"></td><td id="actualA4"></td><td id="actualPctA4"></td>
+    </tr>
+  </table>
 
-<table>
-<tr>
-<th>Assessment</th>
-<th>Max</th>
-<th>Weight</th>
-<th>Target</th>
-<th>Target %</th>
-<th>Actual</th>
-<th>Actual %</th>
-</tr>
+  <div class="totalbox">
+    <span>Total Actual Marks: <span id="totalActual">0</span></span>
+    <span>Final %: <span id="finalPercent">0</span>%</span>
+  </div>
 
-<tr>
-<td id="assess1"></td>
-<td id="maxA1"></td>
-<td id="weightA1"></td>
-<td><input id="targetA1" oninput="calcAll()"></td>
-<td id="targetPctA1"></td>
-<td id="actualA1"></td>
-<td id="actualPctA1"></td>
-</tr>
+  <div class="totalbox">
+    Predicted Grade: <span id="finalGrade">-</span>
+  </div>
 
-<tr>
-<td id="assess2"></td>
-<td id="maxA2"></td>
-<td id="weightA2"></td>
-<td><input id="targetA2" oninput="calcAll()"></td>
-<td id="targetPctA2"></td>
-<td id="actualA2"></td>
-<td id="actualPctA2"></td>
-</tr>
+  <div class="totalbox">
+    Risk Level: <span id="riskLevel">-</span>
+  </div>
 
-<tr>
-<td id="assess3"></td>
-<td id="maxA3"></td>
-<td id="weightA3"></td>
-<td><input id="targetA3" oninput="calcAll()"></td>
-<td id="targetPctA3"></td>
-<td id="actualA3"></td>
-<td id="actualPctA3"></td>
-</tr>
+  <div class="totalbox">
+    PBPA Status: <span id="pbpaStatus">-</span>
+  </div>
 
-<tr>
-<td id="assess4"></td>
-<td id="maxA4"></td>
-<td id="weightA4"></td>
-<td><input id="targetA4" oninput="calcAll()"></td>
-<td id="targetPctA4"></td>
-<td id="actualA4"></td>
-<td id="actualPctA4"></td>
-</tr>
-</table>
-
-<div class="totalbox">
-Total Target Marks: <span id="totalTargetMarks">0</span>
+  <div class="totalbox">
+    Fail Probability Prediction:
+    <div class="progress-bar">
+      <div id="failProbBar" class="progress-bar-fill">-</div>
+    </div>
+  </div>
 </div>
 
-<div class="totalbox">
-Total Actual Marks: <span id="totalActual">0</span>
-</div>
-
-<div class="totalbox">
-Final Percentage: <span id="finalPercent">0</span>%
-</div>
-
-<div class="totalbox">
-Predicted Grade: <span id="finalGrade">-</span>
-</div>
-
-<div class="totalbox">
-Risk Level: <span id="riskLevel">-</span>
-</div>
-
-<div class="totalbox">
-PBPA Status: <span id="pbpaStatus">-</span>
-</div>
-
-</div>
 
 <script>
 var url="https://script.google.com/macros/s/AKfycbwpJSOenUu5Lg-_FvQYNiX31LbetAWEwlPhmoQzJLfYD4MIfVQLeuAJzPR8QECV8kc2-A/exec";
