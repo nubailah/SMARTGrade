@@ -5,18 +5,18 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>SMARTGrade</title>
+<title>SMARTGrade Planner</title>
 
 <style>
 
 body{
 font-family:Arial;
-background:#f4f6fb;
+background:#f5f6fa;
 padding:20px;
 }
 
 .container{
-max-width:1100px;
+max-width:1000px;
 margin:auto;
 background:white;
 padding:25px;
@@ -29,14 +29,14 @@ border-collapse:collapse;
 margin-top:20px;
 }
 
-td,th{
+th,td{
 border:1px solid #ddd;
 padding:10px;
 text-align:center;
 }
 
 input{
-width:80px;
+width:70px;
 padding:5px;
 }
 
@@ -58,7 +58,7 @@ font-weight:bold;
 
 <div class="container">
 
-<h2>Student Planner</h2>
+<h2>SMARTGrade Student Planner</h2>
 
 Student ID
 
@@ -79,7 +79,6 @@ Student ID
 <tr>
 <th>Assessment</th>
 <th>Max</th>
-<th>Weight</th>
 <th>Target</th>
 <th>Target %</th>
 <th>Actual</th>
@@ -88,42 +87,38 @@ Student ID
 
 <tr>
 <td id="assess1"></td>
-<td id="maxA1"></td>
-<td id="weightA1"></td>
-<td><input id="targetA1" oninput="calcTarget()"></td>
-<td id="targetPctA1"></td>
-<td id="actualA1"></td>
-<td id="actualPctA1"></td>
+<td id="max1"></td>
+<td><input id="target1" oninput="calcTarget()"></td>
+<td id="targetPct1"></td>
+<td id="actual1"></td>
+<td id="actualPct1"></td>
 </tr>
 
 <tr>
 <td id="assess2"></td>
-<td id="maxA2"></td>
-<td id="weightA2"></td>
-<td><input id="targetA2" oninput="calcTarget()"></td>
-<td id="targetPctA2"></td>
-<td id="actualA2"></td>
-<td id="actualPctA2"></td>
+<td id="max2"></td>
+<td><input id="target2" oninput="calcTarget()"></td>
+<td id="targetPct2"></td>
+<td id="actual2"></td>
+<td id="actualPct2"></td>
 </tr>
 
 <tr>
 <td id="assess3"></td>
-<td id="maxA3"></td>
-<td id="weightA3"></td>
-<td><input id="targetA3" oninput="calcTarget()"></td>
-<td id="targetPctA3"></td>
-<td id="actualA3"></td>
-<td id="actualPctA3"></td>
+<td id="max3"></td>
+<td><input id="target3" oninput="calcTarget()"></td>
+<td id="targetPct3"></td>
+<td id="actual3"></td>
+<td id="actualPct3"></td>
 </tr>
 
 <tr>
 <td id="assess4"></td>
-<td id="maxA4"></td>
-<td id="weightA4"></td>
-<td><input id="targetA4" oninput="calcTarget()"></td>
-<td id="targetPctA4"></td>
-<td id="actualA4"></td>
-<td id="actualPctA4"></td>
+<td id="max4"></td>
+<td><input id="target4" oninput="calcTarget()"></td>
+<td id="targetPct4"></td>
+<td id="actual4"></td>
+<td id="actualPct4"></td>
 </tr>
 
 </table>
@@ -152,7 +147,7 @@ PBPA Status: <span id="pbpaStatus">-</span>
 
 <script>
 
-var url="https://script.google.com/macros/s/AKfycbzXVe0awNH1wha_sQKZO7fxFolE0wDehO4YM3x5gRIb8ipY5CTz8QXbtp_rge9IFjPgaw/exec";
+var url="https://script.google.com/macros/s/AKfycbwYeABZKhid1AO4XLD8V2hGIfI2Tle79vasdDxgrK3vEcFyEHFD-1PSA-5GyZw6VFW9bg/exec";
 
 function getGrade(p){
 
@@ -172,15 +167,21 @@ return "F";
 function detectRisk(p){
 
 if(p>=70){
+
 document.getElementById("riskLevel").innerText="SAFE";
+
 }
 
 else if(p>=50){
+
 document.getElementById("riskLevel").innerText="MODERATE RISK";
+
 }
 
 else{
+
 document.getElementById("riskLevel").innerText="HIGH RISK";
+
 }
 
 }
@@ -189,15 +190,13 @@ function calcTarget(){
 
 for(let i=1;i<=4;i++){
 
-let target=parseFloat(document.getElementById("targetA"+i).value)||0;
+let target=parseFloat(document.getElementById("target"+i).value)||0;
 
-let max=parseFloat(document.getElementById("maxA"+i).innerText)||1;
+let max=parseFloat(document.getElementById("max"+i).innerText)||1;
 
-let weight=parseFloat(document.getElementById("weightA"+i).innerText)||0;
+let pct=(target/max)*100;
 
-let pct=(target/max)*weight;
-
-document.getElementById("targetPctA"+i).innerText=pct.toFixed(2);
+document.getElementById("targetPct"+i).innerText=pct.toFixed(2);
 
 }
 
@@ -212,20 +211,32 @@ let totalMax=0;
 
 for(let i=1;i<=4;i++){
 
-let actual=parseFloat(document.getElementById("actualA"+i).innerText)||0;
+let actual=parseFloat(document.getElementById("actual"+i).innerText);
 
-let max=parseFloat(document.getElementById("maxA"+i).innerText)||1;
+let max=parseFloat(document.getElementById("max"+i).innerText);
 
-let pct=(actual/max)*weight;
+if(!isNaN(actual) && actual>0){
 
-document.getElementById("actualPctA"+i).innerText=pct.toFixed(2);
+let pct=(actual/max)*100;
+
+document.getElementById("actualPct"+i).innerText=pct.toFixed(2);
 
 totalActual+=actual;
 totalMax+=max;
 
 }
 
+else{
+
+document.getElementById("actualPct"+i).innerText="";
+
+}
+
+}
+
 document.getElementById("totalActual").innerText=totalActual;
+
+if(totalMax>0){
 
 let finalPercent=(totalActual/totalMax)*100;
 
@@ -239,23 +250,31 @@ checkPBPA(totalActual,totalMax);
 
 }
 
+}
+
 function checkPBPA(actual,max){
 
-let passMark=0.45*max;
+let passmark=0.45*max;
 
-if(actual>=passMark){
+let msg="";
 
-document.getElementById("pbpaStatus").innerText="PASS PBPA";
+if(actual>=passmark){
+
+msg="PASS PBPA - TOTAL ACTUAL MARK >= "+passmark.toFixed(2);
+
 document.getElementById("pbpaStatus").style.color="green";
 
 }
 
 else{
 
-document.getElementById("pbpaStatus").innerText="FAIL PBPA";
+msg="FAIL PBPA - TOTAL ACTUAL MARK < "+passmark.toFixed(2);
+
 document.getElementById("pbpaStatus").style.color="red";
 
 }
+
+document.getElementById("pbpaStatus").innerText=msg;
 
 }
 
@@ -271,6 +290,8 @@ fetch(url+"?id="+id)
 
 if(data.length==0){
 
+clearAll();
+
 alert("ID not found");
 
 return;
@@ -280,19 +301,17 @@ return;
 document.getElementById("class").innerText=data[0];
 document.getElementById("name").innerText=data[2];
 
-let assess=[3,8,13,18];
-let max=[5,10,15,20];
-let weight=[6,11,16,21];
-let actual=[7,12,17,22];
-let target=[4,9,14,19];
+let assess=[3,7,11,15];
+let target=[4,8,12,16];
+let max=[5,9,13,17];
+let actual=[6,10,14,18];
 
 for(let i=1;i<=4;i++){
 
 document.getElementById("assess"+i).innerText=data[assess[i-1]];
-document.getElementById("maxA"+i).innerText=data[max[i-1]];
-document.getElementById("weightA"+i).innerText=data[weight[i-1]];
-document.getElementById("actualA"+i).innerText=data[actual[i-1]];
-document.getElementById("targetA"+i).value=data[target[i-1]];
+document.getElementById("max"+i).innerText=data[max[i-1]];
+document.getElementById("actual"+i).innerText=data[actual[i-1]];
+document.getElementById("target"+i).value=data[target[i-1]];
 
 }
 
@@ -307,10 +326,10 @@ function saveTarget(){
 let payload={
 
 id:document.getElementById("studentID").value,
-targetA1:document.getElementById("targetA1").value,
-targetA2:document.getElementById("targetA2").value,
-targetA3:document.getElementById("targetA3").value,
-targetA4:document.getElementById("targetA4").value
+target1:document.getElementById("target1").value,
+target2:document.getElementById("target2").value,
+target3:document.getElementById("target3").value,
+target4:document.getElementById("target4").value
 
 };
 
