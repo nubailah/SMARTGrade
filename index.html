@@ -2,29 +2,105 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SMARTGrade Planner</title>
+<title>SMARTGrade Planner - Mobile Friendly</title>
 <style>
-body{font-family:'Segoe UI',sans-serif;background:#f0f2f7;margin:0;padding:0;}
-header{background:linear-gradient(135deg,#5f6bdc,#8b5bbf);color:white;padding:20px;text-align:center;border-bottom-left-radius:20px;border-bottom-right-radius:20px;box-shadow:0 4px 15px rgba(0,0,0,0.2);}
-header h1{margin:0;font-size:2em;}
-.container{max-width:1100px;margin:30px auto;background:white;border-radius:15px;padding:25px;box-shadow:0 10px 25px rgba(0,0,0,0.1);}
-table{width:100%;border-collapse:collapse;margin-top:20px;}
-th,td{border:1px solid #ddd;padding:12px;text-align:center;}
-th{background:#f3f4f7;font-weight:600;}
-input{width:80px;padding:5px;border-radius:5px;border:1px solid #ccc;}
-button{padding:10px 16px;margin:5px;border-radius:6px;border:none;cursor:pointer;background:linear-gradient(135deg,#5f6bdc,#8b5bbf);color:white;font-weight:600;transition:0.3s;}
-button:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,0.2);}
-.totalbox{margin-top:15px;font-weight:600;display:flex;justify-content:space-between;align-items:center;}
+body{
+  font-family:'Segoe UI',sans-serif;
+  background:#f0f2f7;
+  margin:0;padding:0;
+}
+header{
+  background:linear-gradient(135deg,#5f6bdc,#8b5bbf);
+  color:white;
+  padding:20px;
+  text-align:center;
+  border-bottom-left-radius:20px;
+  border-bottom-right-radius:20px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.2);
+}
+header h1{margin:0;font-size:1.6em;}
+.container{
+  max-width:1000px;
+  margin:20px auto;
+  background:white;
+  border-radius:15px;
+  padding:20px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.1);
+  overflow-x:auto;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+th,td{
+  border:1px solid #ddd;
+  padding:8px;
+  text-align:center;
+  font-size:0.9em;
+}
+th{
+  background:#f3f4f7;
+  font-weight:600;
+}
+input{
+  width:70px;
+  padding:5px;
+  border-radius:5px;
+  border:1px solid #ccc;
+}
+button{
+  padding:10px 16px;
+  margin:5px 2px;
+  border-radius:6px;
+  border:none;
+  cursor:pointer;
+  background:linear-gradient(135deg,#5f6bdc,#8b5bbf);
+  color:white;
+  font-weight:600;
+  transition:0.3s;
+}
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+.totalbox{
+  margin-top:10px;
+  font-weight:600;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+}
 .correct{background-color:#c8e6c9;font-weight:bold;}
 .wrong{background-color:#ffcdd2;font-weight:bold;}
-.progress-bar{height:20px;border-radius:10px;background-color:#eee;overflow:hidden;margin-top:5px;}
-.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#5f6bdc,#8b5bbf);text-align:center;color:white;font-weight:bold;transition:width 0.5s ease;}
+.progress-bar{
+  height:20px;
+  border-radius:10px;
+  background-color:#eee;
+  overflow:hidden;
+  margin-top:5px;
+}
+.progress-bar-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#5f6bdc,#8b5bbf);
+  text-align:center;
+  color:white;
+  font-weight:bold;
+  transition:width 0.5s ease;
+}
+@media(max-width:600px){
+  th,td,input,button{font-size:0.8em;padding:6px;}
+  header h1{font-size:1.3em;}
+  .totalbox{flex-direction:column;align-items:flex-start;}
+}
 </style>
 </head>
 <body>
 <header>
-<h1>SMARTGrade Planner</h1>
-<p>Student Target vs Actual Assessment Analyzer</p>
+  <h1>SMARTGrade Planner</h1>
+  <p>Student Target vs Actual Assessment Analyzer</p>
 </header>
 <div class="container">
 <h2>Student Planner</h2>
@@ -44,20 +120,15 @@ button:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,0.2);}
 <tr><td id="assess4"></td><td id="maxA4"></td><td id="weightA4"></td><td><input id="targetA4" oninput="calcAll()"></td><td id="targetPctA4"></td><td id="actualA4"></td><td id="actualPctA4"></td></tr>
 </table>
 
-<div class="totalbox">
+<div class="totalbox"><span>Total Target Marks: <span id="totalTarget">0</span></span>
 <span>Total Actual Marks: <span id="totalActual">0</span></span>
-<span>Final %: <span id="finalPercent">0</span>%</span>
-</div>
+<span>Final %: <span id="finalPercent">0</span>%</span></div>
 
 <div class="totalbox">Predicted Grade: <span id="finalGrade">-</span></div>
 <div class="totalbox">Risk Level: <span id="riskLevel">-</span></div>
 <div class="totalbox">PBPA Status: <span id="pbpaStatus">-</span></div>
-<div class="totalbox">
-Fail Probability Prediction:
-<div class="progress-bar">
-<div id="failProbBar" class="progress-bar-fill">-</div>
-</div>
-</div>
+<div class="totalbox">Pass Probability Prediction:
+<div class="progress-bar"><div id="failProbBar" class="progress-bar-fill">-</div></div></div>
 </div>
 
 <script>
@@ -83,38 +154,45 @@ function detectRisk(p){
 }
 
 function calcAll(){
-  let totalActual=0,totalMax=0,totalTarget=0;
+  let totalActual=0,totalMaxActual=0,totalTarget=0,totalMaxTarget=0;
+
   for(let i=1;i<=4;i++){
     let target=parseFloat(document.getElementById("targetA"+i).value)||0;
     let max=parseFloat(document.getElementById("maxA"+i).innerText)||0;
     let weight=parseFloat(document.getElementById("weightA"+i).innerText)||0;
     let actual=parseFloat(document.getElementById("actualA"+i).innerText)||0;
 
-    // target %
+    // Target %
     let targetPct=(target/max)*weight||0;
     document.getElementById("targetPctA"+i).innerText=targetPct.toFixed(2);
 
-    // actual %
+    // Actual %
     let actualPct=(actual/max)*weight||0;
     document.getElementById("actualPctA"+i).innerText=actualPct.toFixed(2);
 
-    // color coding
+    // Colour indicator
     if(actualPct>=targetPct) document.getElementById("actualPctA"+i).parentElement.className="correct";
     else document.getElementById("actualPctA"+i).parentElement.className="wrong";
 
-    totalActual+=actual;
-    totalMax+=max;
+    // Summations
     totalTarget+=target;
+    totalMaxTarget+=max;
+    if(actual>0){
+      totalActual+=actual;
+      totalMaxActual+=max;
+    }
   }
 
-  let finalPercent=totalActual/totalMax*100;
+  document.getElementById("totalTarget").innerText=totalTarget.toFixed(2);
   document.getElementById("totalActual").innerText=totalActual.toFixed(2);
+
+  let finalPercent=(totalActual/totalMaxActual)*100||0;
   document.getElementById("finalPercent").innerText=finalPercent.toFixed(2);
   document.getElementById("finalGrade").innerText=getGrade(finalPercent);
   detectRisk(finalPercent);
 
-  // PBPA
-  let passMark=0.45*totalMax;
+  // PBPA Status
+  let passMark=0.45*(totalMaxActual>0?totalMaxActual:1);
   if(totalActual>=passMark){
     document.getElementById("pbpaStatus").innerText="PASS PBPA - TOTAL ACTUAL MARK >= "+passMark.toFixed(2);
     document.getElementById("pbpaStatus").style.color="green";
@@ -123,10 +201,11 @@ function calcAll(){
     document.getElementById("pbpaStatus").style.color="red";
   }
 
-  // Fail Probability bar
-  let failProb=Math.max(0,100-finalPercent);
-  document.getElementById("failProbBar").style.width=failProb+"%";
-  document.getElementById("failProbBar").innerText=failProb.toFixed(0)+"%";
+  // Pass probability
+  let passProb=(passMark-totalActual)/passMark*100;
+  passProb=Math.max(0,Math.min(100,passProb));
+  document.getElementById("failProbBar").style.width=(100-passProb)+"%";
+  document.getElementById("failProbBar").innerText=(100-passProb).toFixed(0)+"%";
 }
 
 function loadStudent(){
