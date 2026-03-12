@@ -4,27 +4,85 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SMARTGrade Planner</title>
 <style>
-body{font-family:Arial,sans-serif;background:#f4f6fb;margin:0;padding:15px;}
-.container{max-width:1000px;margin:auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 5px 20px rgba(0,0,0,0.1);}
-h2{text-align:center;color:#4b5bdc;}
-input[type=text]{width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:10px;}
-table{width:100%;border-collapse:collapse;margin-top:10px;}
-th,td{border:1px solid #ddd;padding:8px;text-align:center;}
-th{background:#f3f4f7;}
-.totalbox{margin-top:15px;font-weight:bold;font-size:16px;}
-.correct{background-color:#c8e6c9;}
-.wrong{background-color:#ffcdd2;}
-button{padding:10px 15px;background:#4b5bdc;color:white;border:none;border-radius:6px;cursor:pointer;margin:5px 0;}
-@media(max-width:600px){td,th,input,button{font-size:12px;padding:5px;}}
+body {
+  font-family: Arial, sans-serif;
+  background: #eef2f7;
+  margin: 0;
+  padding: 10px;
+}
+.header {
+  background: linear-gradient(135deg,#5f6bdc,#8b5bbf);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+.container {
+  max-width: 1000px;
+  margin: -30px auto 0 auto;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+h2 {color:#4b5bdc; text-align:center;}
+input[type=text] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+th,td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+th {background: #f3f4f7;}
+.correct {background-color: #c8e6c9;}
+.wrong {background-color: #ffcdd2;}
+.totalbox {margin-top:10px; font-weight:bold; font-size:15px;}
+.status {
+  font-weight:bold;
+  padding:5px 10px;
+  border-radius:6px;
+  display:inline-block;
+}
+.pass {background-color:#4caf50; color:white;}
+.fail {background-color:#f44336; color:white;}
+@media(max-width:600px){
+  table, th, td, input, button{font-size:12px; padding:5px;}
+}
+button {
+  padding:10px 15px;
+  margin:5px 0;
+  background:#4b5bdc;
+  color:white;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
 
+<div class="header">
+  <h1>SMARTGrade Planner System</h1>
+  <p>Student Target vs Actual Assessment Analyzer</p>
+</div>
+
 <div class="container">
-<h2>SMARTGrade Planner System</h2>
+<h2>Student Planner</h2>
 
 <label>Student ID</label>
-<input type="text" id="studentID" placeholder="Enter Student ID here...">
+<input type="text" id="studentID" placeholder="Enter Student ID...">
 <button onclick="loadStudent()">Load Student</button>
 <button onclick="saveTarget()">Save Target</button>
 <button onclick="clearAll()">Clear</button>
@@ -48,9 +106,8 @@ button{padding:10px 15px;background:#4b5bdc;color:white;border:none;border-radiu
 <div class="totalbox">Final %: <span id="finalPercent">0</span>%</div>
 <div class="totalbox">Predicted Grade: <span id="finalGrade">-</span></div>
 <div class="totalbox">Risk Level: <span id="riskLevel">-</span></div>
-<div class="totalbox">PBPA Status: <span id="pbpaStatus">-</span></div>
+<div class="totalbox">PBPA Status: <span id="pbpaStatus" class="status">-</span></div>
 <div class="totalbox">Fail Probability Prediction: <span id="failProb">0%</span></div>
-
 </div>
 
 <script>
@@ -90,13 +147,11 @@ function calcTarget(){
   let targetFinal=(totalTargetMax>0)?(totalTarget/totalTargetMax*100):0;
   document.getElementById("targetFinalPct").innerText=targetFinal.toFixed(2);
 
-  calcActual(); // auto update actual % & grade
+  calcActual();
 }
 
 function calcActual(){
   let totalActual=0,totalActualMax=0;
-  let totalPctSum=0;
-
   for(let i=1;i<=4;i++){
     let actual=parseFloat(document.getElementById("actualA"+i).innerText)||0;
     let target=parseFloat(document.getElementById("targetA"+i).value)||0;
@@ -106,7 +161,7 @@ function calcActual(){
     let pct=(actual/max)*weight;
     document.getElementById("actualPctA"+i).innerText=pct.toFixed(2);
 
-    // auto color indicator
+    // Auto color
     if(actual >= target) document.getElementById("actualA"+i).parentNode.className="correct";
     else document.getElementById("actualA"+i).parentNode.className="wrong";
 
@@ -115,27 +170,25 @@ function calcActual(){
   }
 
   document.getElementById("totalActual").innerText=totalActual;
-
   let finalPercent=(totalActualMax>0)?(totalActual/totalActualMax*100):0;
   document.getElementById("finalPercent").innerText=finalPercent.toFixed(2);
-
   document.getElementById("finalGrade").innerText=getGrade(finalPercent);
   detectRisk(finalPercent);
 
-  // PBPA Status 45% of total max (all assignments)
+  // PBPA Status
   let allMax=0;
   for(let i=1;i<=4;i++) allMax+=parseFloat(document.getElementById("maxA"+i).innerText)||0;
   let passMark=0.45*allMax;
+  let pbpa=document.getElementById("pbpaStatus");
   if(totalActual>=passMark){
-    document.getElementById("pbpaStatus").innerText="PASS PBPA - TOTAL ACTUAL MARK >= "+passMark.toFixed(2);
-    document.getElementById("pbpaStatus").style.color="green";
-  } else {
-    document.getElementById("pbpaStatus").innerText="FAIL PBPA - TOTAL ACTUAL MARK < "+passMark.toFixed(2);
-    document.getElementById("pbpaStatus").style.color="red";
+    pbpa.innerText="PASS PBPA - TOTAL ACTUAL MARK >= "+passMark.toFixed(2);
+    pbpa.className="status pass";
+  } else{
+    pbpa.innerText="FAIL PBPA - TOTAL ACTUAL MARK < "+passMark.toFixed(2);
+    pbpa.className="status fail";
   }
 
-  // Fail Probability Prediction
-  let failProb=Math.max(0,45-finalPercent); // if finalPercent<45, shows % to pass
+  let failProb=Math.max(0,(passMark-totalActual)/passMark*100);
   document.getElementById("failProb").innerText=failProb.toFixed(2)+"%";
 }
 
@@ -155,19 +208,15 @@ function loadStudent(){
           document.getElementById("targetPctA"+i).innerText=0;
           document.getElementById("actualPctA"+i).innerText=0;
         }
-        calcTarget();
-        return;
+        calcTarget(); return;
       }
-
       document.getElementById("class").innerText=data[0];
       document.getElementById("name").innerText=data[2];
-
       let assess=[3,8,13,18];
       let max=[5,10,15,20];
       let weight=[6,11,16,21];
       let actual=[7,12,17,22];
       let target=[4,9,14,19];
-
       for(let i=1;i<=4;i++){
         document.getElementById("assess"+i).innerText=data[assess[i-1]];
         document.getElementById("maxA"+i).innerText=data[max[i-1]];
@@ -175,7 +224,6 @@ function loadStudent(){
         document.getElementById("actualA"+i).innerText=data[actual[i-1]];
         document.getElementById("targetA"+i).value=data[target[i-1]];
       }
-
       calcTarget();
     });
 }
