@@ -1,19 +1,17 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>SMARTGrade v4</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>SMARTGrade</title>
 
 <style>
 
 body{
 font-family:Arial;
-background:linear-gradient(135deg,#5f6bdc,#8b5bbf);
-margin:0;
+background:#f4f6fb;
 padding:20px;
 }
 
@@ -22,24 +20,7 @@ max-width:1100px;
 margin:auto;
 background:white;
 padding:25px;
-border-radius:12px;
-}
-
-h1{
-color:#333;
-}
-
-input{
-padding:10px;
-margin:5px;
-}
-
-button{
-padding:10px 15px;
-background:#4b5bdc;
-color:white;
-border:none;
-border-radius:5px;
+border-radius:10px;
 }
 
 table{
@@ -54,12 +35,14 @@ padding:10px;
 text-align:center;
 }
 
-.correct{
-background:#c8e6c9;
+input{
+width:80px;
+padding:5px;
 }
 
-.wrong{
-background:#ffcdd2;
+button{
+padding:10px 15px;
+margin-top:10px;
 }
 
 .totalbox{
@@ -75,7 +58,7 @@ font-weight:bold;
 
 <div class="container">
 
-<h1>SMARTGrade Planner</h1>
+<h2>Student Planner</h2>
 
 Student ID
 
@@ -101,90 +84,75 @@ Student ID
 <th>Target %</th>
 <th>Actual</th>
 <th>Actual %</th>
-<th>Grade</th>
 </tr>
 
 <tr>
 <td id="assess1"></td>
 <td id="maxA1"></td>
-<td id="perA1"></td>
+<td id="weightA1"></td>
 <td><input id="targetA1" oninput="calcTarget()"></td>
-<td id="resA1"></td>
+<td id="targetPctA1"></td>
 <td id="actualA1"></td>
 <td id="actualPctA1"></td>
-<td id="grade1"></td>
 </tr>
 
 <tr>
 <td id="assess2"></td>
 <td id="maxA2"></td>
-<td id="perA2"></td>
+<td id="weightA2"></td>
 <td><input id="targetA2" oninput="calcTarget()"></td>
-<td id="resA2"></td>
+<td id="targetPctA2"></td>
 <td id="actualA2"></td>
 <td id="actualPctA2"></td>
-<td id="grade2"></td>
 </tr>
 
 <tr>
 <td id="assess3"></td>
 <td id="maxA3"></td>
-<td id="perA3"></td>
+<td id="weightA3"></td>
 <td><input id="targetA3" oninput="calcTarget()"></td>
-<td id="resA3"></td>
+<td id="targetPctA3"></td>
 <td id="actualA3"></td>
 <td id="actualPctA3"></td>
-<td id="grade3"></td>
 </tr>
 
 <tr>
 <td id="assess4"></td>
 <td id="maxA4"></td>
-<td id="perA4"></td>
+<td id="weightA4"></td>
 <td><input id="targetA4" oninput="calcTarget()"></td>
-<td id="resA4"></td>
+<td id="targetPctA4"></td>
 <td id="actualA4"></td>
 <td id="actualPctA4"></td>
-<td id="grade4"></td>
 </tr>
 
 </table>
 
 <div class="totalbox">
-
-Total Target Marks:
-<span id="totalTarget">0</span>
-
+Total Actual Marks: <span id="totalActual">0</span>
 </div>
 
 <div class="totalbox">
-
-Total Actual Marks:
-<span id="totalActual">0</span>
-
+Final Percentage: <span id="finalPercent">0</span>%
 </div>
 
 <div class="totalbox">
-
-Final Predicted Grade:
-<span id="finalGrade">-</span>
-
+Predicted Grade: <span id="finalGrade">-</span>
 </div>
 
 <div class="totalbox">
-
-AI Risk Level:
-<span id="riskLevel">-</span>
-
+Risk Level: <span id="riskLevel">-</span>
 </div>
 
-<canvas id="performanceChart"></canvas>
+<div class="totalbox">
+PBPA Status: <span id="pbpaStatus">-</span>
+</div>
 
 </div>
 
 <script>
 
-var url="https://script.google.com/macros/s/AKfycbxGy-1okvaWL30occ2Ayga-sVrPIiyxu4_vVYXqwc1NSYN02hFcyER-Igv4oFRRc_7A0g/exec";
+var url="https://script.google.com/macros/s/AKfycbzXVe0awNH1wha_sQKZO7fxFolE0wDehO4YM3x5gRIb8ipY5CTz8QXbtp_rge9IFjPgaw/exec";
 
 function getGrade(p){
 
@@ -197,36 +165,27 @@ if(p>=60) return "B-";
 if(p>=55) return "C+";
 if(p>=50) return "C";
 if(p>=45) return "C-";
-
 return "F";
 
 }
 
-function detectRisk(percent){
+function detectRisk(p){
 
-if(percent>=70){
-
+if(p>=70){
 document.getElementById("riskLevel").innerText="SAFE";
-
 }
 
-else if(percent>=50){
-
+else if(p>=50){
 document.getElementById("riskLevel").innerText="MODERATE RISK";
-
 }
 
 else{
-
 document.getElementById("riskLevel").innerText="HIGH RISK";
-
 }
 
 }
 
 function calcTarget(){
-
-let totalTarget=0;
 
 for(let i=1;i<=4;i++){
 
@@ -234,17 +193,13 @@ let target=parseFloat(document.getElementById("targetA"+i).value)||0;
 
 let max=parseFloat(document.getElementById("maxA"+i).innerText)||1;
 
-let weight=parseFloat(document.getElementById("perA"+i).innerText)||0;
+let weight=parseFloat(document.getElementById("weightA"+i).innerText)||0;
 
 let pct=(target/max)*weight;
 
-document.getElementById("resA"+i).innerText=pct.toFixed(2);
-
-totalTarget+=target;
+document.getElementById("targetPctA"+i).innerText=pct.toFixed(2);
 
 }
-
-document.getElementById("totalTarget").innerText=totalTarget;
 
 calcActual();
 
@@ -253,7 +208,7 @@ calcActual();
 function calcActual(){
 
 let totalActual=0;
-let totalPct=0;
+let totalMax=0;
 
 for(let i=1;i<=4;i++){
 
@@ -261,26 +216,46 @@ let actual=parseFloat(document.getElementById("actualA"+i).innerText)||0;
 
 let max=parseFloat(document.getElementById("maxA"+i).innerText)||1;
 
-let weight=parseFloat(document.getElementById("perA"+i).innerText)||0;
-
-let pct=(actual/max)*weight;
+let pct=(actual/max)*100;
 
 document.getElementById("actualPctA"+i).innerText=pct.toFixed(2);
 
-document.getElementById("grade"+i).innerText=getGrade(pct*100);
-
 totalActual+=actual;
-totalPct+=pct;
+totalMax+=max;
 
 }
 
 document.getElementById("totalActual").innerText=totalActual;
 
-let finalPercent=totalPct*100;
+let finalPercent=(totalActual/totalMax)*100;
+
+document.getElementById("finalPercent").innerText=finalPercent.toFixed(2);
 
 document.getElementById("finalGrade").innerText=getGrade(finalPercent);
 
 detectRisk(finalPercent);
+
+checkPBPA(totalActual,totalMax);
+
+}
+
+function checkPBPA(actual,max){
+
+let passMark=0.45*max;
+
+if(actual>=passMark){
+
+document.getElementById("pbpaStatus").innerText="PASS PBPA";
+document.getElementById("pbpaStatus").style.color="green";
+
+}
+
+else{
+
+document.getElementById("pbpaStatus").innerText="FAIL PBPA";
+document.getElementById("pbpaStatus").style.color="red";
+
+}
 
 }
 
@@ -315,7 +290,7 @@ for(let i=1;i<=4;i++){
 
 document.getElementById("assess"+i).innerText=data[assess[i-1]];
 document.getElementById("maxA"+i).innerText=data[max[i-1]];
-document.getElementById("perA"+i).innerText=data[weight[i-1]];
+document.getElementById("weightA"+i).innerText=data[weight[i-1]];
 document.getElementById("actualA"+i).innerText=data[actual[i-1]];
 document.getElementById("targetA"+i).value=data[target[i-1]];
 
@@ -355,5 +330,4 @@ location.reload();
 </script>
 
 </body>
-
 </html>
