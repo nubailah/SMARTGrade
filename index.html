@@ -2,237 +2,209 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SMARTGrade Planner Pro</title>
+<title>SMART Planner</title>
+
 <style>
-body{
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #eef2f7;
-  margin:0; padding:0;
-}
-.header{
-  background: linear-gradient(135deg,#5f6bdc,#8b5bbf);
-  color:white; text-align:center; padding:25px; border-radius:0 0 15px 15px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.2);
-}
-.container{
-  max-width: 1000px;
-  margin:20px auto;
-  background:white;
-  padding:20px;
-  border-radius:15px;
-  box-shadow:0 5px 20px rgba(0,0,0,0.1);
-}
-h2{text-align:center; color:#4b5bdc;}
-input[type=text]{
-  width: 100%; padding:12px; border-radius:6px; border:1px solid #ccc; margin-bottom:10px;
-  box-sizing:border-box;
-}
-table{
-  width:100%; border-collapse:collapse; margin-top:15px;
-  overflow-x:auto;
-}
-th, td{
-  border:1px solid #ddd; padding:10px; text-align:center;
-}
-th{background:#f3f4f7;}
-.correct{background-color:#c8e6c9;}
-.wrong{background-color:#ffcdd2;}
-.totalbox{margin-top:12px; font-weight:bold; font-size:15px;}
-.status{
-  font-weight:bold;
-  padding:5px 10px; border-radius:6px; display:inline-block;
-}
-.pass{background-color:#4caf50;color:white;}
-.fail{background-color:#f44336;color:white;}
-.progress-container{
-  width:100%; background:#ddd; border-radius:8px; overflow:hidden; margin-top:5px;
-}
-.progress-bar{
-  height:20px; background:#4caf50; text-align:center; color:white; line-height:20px;
-}
-@media(max-width:600px){
-  table, th, td, input, button{font-size:12px; padding:5px;}
-  .progress-bar{font-size:10px; line-height:16px;}
-}
-button{
-  padding:10px 15px; margin:5px 0; background:#4b5bdc; color:white; border:none; border-radius:6px; cursor:pointer;
-}
+body{font-family:Segoe UI;margin:0;background:#eef2f7;}
+.header{background:#5f6bdc;color:white;padding:15px;text-align:center;}
+.container{padding:15px;}
+.card{background:white;padding:15px;border-radius:10px;margin-top:10px;}
+input,select,textarea{width:100%;padding:8px;margin:5px 0;}
+button{padding:10px;background:#5f6bdc;color:white;border:none;}
+table{width:100%;border-collapse:collapse;}
+td,th{border:1px solid #ccc;padding:6px;text-align:center;}
 </style>
 </head>
+
 <body>
 
 <div class="header">
-<h1>SMARTGrade Planner Pro</h1>
-<p>Student Target vs Actual Assessment Analyzer</p>
+<h2>SMART Planner System</h2>
 </div>
 
 <div class="container">
-<h2>Student Planner</h2>
 
-<label>Student ID</label>
-<input type="text" id="studentID" placeholder="Enter Student ID...">
-<button onclick="loadStudent()">Load Student</button>
-<button onclick="saveTarget()">Save Target</button>
-<button onclick="clearAll()">Clear</button>
-
-<p><b>Name:</b> <span id="name">-</span></p>
-<p><b>Class:</b> <span id="class">-</span></p>
-
-<div style="overflow-x:auto;">
-<table>
-<tr>
-<th>Assessment</th><th>Max</th><th>Weight</th><th>Target</th><th>Target %</th><th>Actual</th><th>Actual %</th>
-</tr>
-<tr><td id="assess1"></td><td id="maxA1"></td><td id="weightA1"></td><td><input id="targetA1" oninput="calcTarget()"></td><td id="targetPctA1"></td><td id="actualA1"></td><td id="actualPctA1"></td></tr>
-<tr><td id="assess2"></td><td id="maxA2"></td><td id="weightA2"></td><td><input id="targetA2" oninput="calcTarget()"></td><td id="targetPctA2"></td><td id="actualA2"></td><td id="actualPctA2"></td></tr>
-<tr><td id="assess3"></td><td id="maxA3"></td><td id="weightA3"></td><td><input id="targetA3" oninput="calcTarget()"></td><td id="targetPctA3"></td><td id="actualA3"></td><td id="actualPctA3"></td></tr>
-<tr><td id="assess4"></td><td id="maxA4"></td><td id="weightA4"></td><td><input id="targetA4" oninput="calcTarget()"></td><td id="targetPctA4"></td><td id="actualA4"></td><td id="actualPctA4"></td></tr>
-</table>
+<!-- LOGIN -->
+<div class="card">
+<h3>Login</h3>
+<input id="loginID">
+<button onclick="login()">Login</button>
 </div>
 
-<div class="totalbox">Total Target Marks: <span id="totalTarget">0</span></div>
-<div class="totalbox">Target Final %: <span id="targetFinalPct">0</span>%</div>
-<div class="totalbox">Total Actual Marks: <span id="totalActual">0</span></div>
-<div class="totalbox">Final %: <span id="finalPercent">0</span>%</div>
-<div class="totalbox">Predicted Grade: <span id="finalGrade">-</span></div>
-<div class="totalbox">Risk Level: <span id="riskLevel">-</span></div>
-<div class="totalbox">PBPA Status: <span id="pbpaStatus" class="status">-</span></div>
+<!-- LECTURER -->
+<div class="card" id="lecturer" style="display:none">
 
-<div class="totalbox">Fail Probability Prediction:</div>
-<div class="progress-container">
-<div class="progress-bar" id="failProb">0%</div>
+<h3>Lecturer</h3>
+
+<h4>Add Student</h4>
+<input id="c" placeholder="Class">
+<input id="id" placeholder="ID">
+<input id="n" placeholder="Name">
+<input id="s" placeholder="Subject">
+<input id="a" placeholder="Advisor">
+<button onclick="addStudent()">Add</button>
+
+<hr>
+
+<h4>Load Students</h4>
+<input id="classF" placeholder="Class">
+<input id="subjectF" placeholder="Subject">
+<select id="assess">
+<option>Assess1</option>
+<option>Assess2</option>
+<option>Assess3</option>
+<option>Assess4</option>
+</select>
+
+<button onclick="loadStudents()">Load</button>
+
+<table id="tbl"></table>
+
 </div>
+
+<!-- ADVISOR -->
+<div class="card" id="advisor" style="display:none">
+<h3>Advisor</h3>
+<table id="tbl2"></table>
+</div>
+
 </div>
 
 <script>
-var url="https://script.google.com/macros/s/AKfycbzKI_9hpgxMu2wI2M58i7pGQcznWnHkOSDOEuGwAdGen3b-TIjnD5lUyYT-YCq-zOvV6g/exec";
 
-function getGrade(p){
-  if(p>=90) return "A+";
-  if(p>=80) return "A";
-  if(p>=75) return "A-";
-  if(p>=70) return "B+";
-  if(p>=65) return "B";
-  if(p>=60) return "B-";
-  if(p>=55) return "C+";
-  if(p>=50) return "C";
-  if(p>=45) return "C-";
-  return "F";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzTLMbTJBJvvXFYlXmmsV5uHk71n8HQZFl7PuJRJQdveYXlSwAEyOQmIn-owvuXtWzi/exec";
+
+let user={};
+
+// ================= LOGIN =================
+function login(){
+  fetch(GAS_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"login",
+      id:document.getElementById("loginID").value
+    })
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.status!="ok") return alert("Fail login");
+
+    user=res;
+
+    if(res.role=="Lecturer"){
+      document.getElementById("lecturer").style.display="block";
+    }
+
+    if(res.role=="Advisor"){
+      document.getElementById("advisor").style.display="block";
+      loadAdvisor();
+    }
+  });
 }
 
-function detectRisk(p){
-  if(p>=70) document.getElementById("riskLevel").innerText="SAFE";
-  else if(p>=50) document.getElementById("riskLevel").innerText="MODERATE RISK";
-  else document.getElementById("riskLevel").innerText="HIGH RISK";
+// ================= ADD STUDENT =================
+function addStudent(){
+  fetch(GAS_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"addStudent",
+      class:document.getElementById("c").value,
+      id:document.getElementById("id").value,
+      name:document.getElementById("n").value,
+      subject:document.getElementById("s").value,
+      advisor:document.getElementById("a").value,
+      lecturer:user.name
+    })
+  }).then(r=>r.json()).then(()=>alert("Added"));
 }
 
-function calcTarget(){
-  let totalTarget=0, totalTargetMax=0;
-  for(let i=1;i<=4;i++){
-    let target=parseFloat(document.getElementById("targetA"+i).value)||0;
-    let max=parseFloat(document.getElementById("maxA"+i).innerText)||0;
-    let weight=parseFloat(document.getElementById("weightA"+i).innerText)||0;
-    let pct=(target/max)*weight;
-    document.getElementById("targetPctA"+i).innerText=pct.toFixed(2);
-    totalTarget+=target;
-    if(target>0) totalTargetMax+=max;
-  }
-  document.getElementById("totalTarget").innerText=totalTarget.toFixed(2);
-  let targetFinal=(totalTargetMax>0)?(totalTarget/totalTargetMax*100):0;
-  document.getElementById("targetFinalPct").innerText=targetFinal.toFixed(2);
+// ================= LOAD STUDENTS =================
+function loadStudents(){
+  fetch(GAS_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"loadStudents",
+      class:document.getElementById("classF").value,
+      subject:document.getElementById("subjectF").value,
+      assess:document.getElementById("assess").value
+    })
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    let tbl=document.getElementById("tbl");
+    tbl.innerHTML="<tr><th>Name</th><th>Target</th><th>Actual</th><th>Need</th><th>Response</th></tr>";
 
-  calcActual();
-}
+    res.data.forEach(s=>{
+      let tr=document.createElement("tr");
 
-function calcActual(){
-  let totalActual=0,totalActualMax=0;
-  for(let i=1;i<=4;i++){
-    let actual=parseFloat(document.getElementById("actualA"+i).innerText)||0;
-    let target=parseFloat(document.getElementById("targetA"+i).value)||0;
-    let max=parseFloat(document.getElementById("maxA"+i).innerText)||0;
-    let weight=parseFloat(document.getElementById("weightA"+i).innerText)||0;
-    let pct=(actual/max)*weight;
-    document.getElementById("actualPctA"+i).innerText=pct.toFixed(2);
-    if(actual >= target) document.getElementById("actualA"+i).parentNode.className="correct";
-    else document.getElementById("actualA"+i).parentNode.className="wrong";
-    totalActual+=actual;
-    if(actual>0) totalActualMax+=max;
-  }
+      tr.innerHTML=`
+        <td>${s.name}</td>
+        <td>${s.target}</td>
+        <td>${s.actual}</td>
+        <td><input type="checkbox" onchange="saveInt('${s.id}','${s.name}','${s.advisor}')"></td>
+        <td><input id="r_${s.id}"></td>
+      `;
 
-  document.getElementById("totalActual").innerText=totalActual;
-  let finalPercent=(totalActualMax>0)?(totalActual/totalActualMax*100):0;
-  document.getElementById("finalPercent").innerText=finalPercent.toFixed(2);
-  document.getElementById("finalGrade").innerText=getGrade(finalPercent);
-  detectRisk(finalPercent);
-
-  // PBPA Status: exclude Assignment 4
-  let allMax=0;
-  for(let i=1;i<=3;i++) allMax+=parseFloat(document.getElementById("maxA"+i).innerText)||0;
-  let passMark=0.45*allMax;
-  let pbpa=document.getElementById("pbpaStatus");
-  if(totalActual>=passMark){
-    pbpa.innerText="PASS PBPA - TOTAL ACTUAL MARK >= "+passMark.toFixed(2);
-    pbpa.className="status pass";
-  } else{
-    pbpa.innerText="FAIL PBPA - TOTAL ACTUAL MARK < "+passMark.toFixed(2);
-    pbpa.className="status fail";
-  }
-
-  let failProb=Math.max(0,(passMark-totalActual)/passMark*100);
-  let bar=document.getElementById("failProb");
-  bar.innerText=failProb.toFixed(2)+"%";
-  bar.style.width=Math.min(failProb,100)+"%";
-  bar.style.background=(failProb>50)?"#f44336":"((failProb>20) ?'#ff9800':'#4caf50')";
-}
-
-function loadStudent(){
-  let id=document.getElementById("studentID").value;
-  fetch(url+"?id="+id)
-    .then(res=>res.json())
-    .then(data=>{
-      if(data.length==0){
-        alert("ID not found");
-        for(let i=1;i<=4;i++){
-          document.getElementById("assess"+i).innerText="-";
-          document.getElementById("maxA"+i).innerText="0";
-          document.getElementById("weightA"+i).innerText="0";
-          document.getElementById("targetA"+i).value=0;
-          document.getElementById("actualA"+i).innerText=0;
-          document.getElementById("targetPctA"+i).innerText=0;
-          document.getElementById("actualPctA"+i).innerText=0;
-        }
-        calcTarget(); return;
-      }
-      document.getElementById("class").innerText=data[0];
-      document.getElementById("name").innerText=data[2];
-      let assess=[3,8,13,18];
-      let max=[5,10,15,20];
-      let weight=[6,11,16,21];
-      let actual=[7,12,17,22];
-      let target=[4,9,14,19];
-      for(let i=1;i<=4;i++){
-        document.getElementById("assess"+i).innerText=data[assess[i-1]];
-        document.getElementById("maxA"+i).innerText=data[max[i-1]];
-        document.getElementById("weightA"+i).innerText=data[weight[i-1]];
-        document.getElementById("actualA"+i).innerText=data[actual[i-1]];
-        document.getElementById("targetA"+i).value=data[target[i-1]];
-      }
-      calcTarget();
+      tbl.appendChild(tr);
     });
+  });
 }
 
-function saveTarget(){
-  let payload={
-    id:document.getElementById("studentID").value,
-    targetA1:document.getElementById("targetA1").value,
-    targetA2:document.getElementById("targetA2").value,
-    targetA3:document.getElementById("targetA3").value,
-    targetA4:document.getElementById("targetA4").value
-  };
-  fetch(url,{method:"POST",body:JSON.stringify(payload)});
+// ================= SAVE INTERVENTION =================
+function saveInt(id,name,advisor){
+  fetch(GAS_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"saveIntervention",
+      id:id,
+      name:name,
+      assessment:document.getElementById("assess").value,
+      lecturerResponse:document.getElementById("r_"+id).value,
+      advisor:advisor
+    })
+  });
 }
 
-function clearAll(){location.reload();}
+// ================= ADVISOR =================
+function loadAdvisor(){
+  fetch(GAS_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"getAdvisor",
+      name:user.name
+    })
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    let tbl=document.getElementById("tbl2");
+    tbl.innerHTML="<tr><th>Student</th><th>Assessment</th><th>Lecturer</th><th>Advisor</th></tr>";
+
+    res.data.forEach(r=>{
+      let tr=document.createElement("tr");
+
+      tr.innerHTML=`
+        <td>${r.student}</td>
+        <td>${r.assessment}</td>
+        <td>${r.lecturer}</td>
+        <td><input onchange="update(${r.row},this.value)"></td>
+      `;
+
+      tbl.appendChild(tr);
+    });
+  });
+}
+
+function update(row,val){
+  fetch(GAS_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"updateAdvisor",
+      row:row,
+      value:val
+    })
+  });
+}
+
 </script>
 
 </body>
