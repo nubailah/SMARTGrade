@@ -6,38 +6,44 @@
 
 <body>
 
-<h2>LOGIN SYSTEM</h2>
+<!-- ================= LOGIN PAGE ================= -->
+<div id="loginPage">
+  <h2>LOGIN SYSTEM</h2>
 
-<!-- ROLE -->
-<select id="role">
-  <option value="STUDENT">STUDENT</option>
-  <option value="LECTURER">LECTURER</option>
-  <option value="ADVISOR">ADVISOR</option>
-</select>
+  <select id="role">
+    <option value="STUDENT">STUDENT</option>
+    <option value="LECTURER">LECTURER</option>
+    <option value="ADVISOR">ADVISOR</option>
+  </select>
 
-<br><br>
+  <br><br>
 
-<input id="id" placeholder="ID / No Gaji">
-<br><br>
+  <input id="id" placeholder="ID / No Gaji">
+  <br><br>
 
-<input id="email" placeholder="Email / IC">
-<br><br>
+  <input id="email" placeholder="Email / IC">
+  <br><br>
 
-<button onclick="login()">LOGIN</button>
+  <button onclick="login()">LOGIN</button>
 
-<p id="msg"></p>
+  <p id="msg"></p>
+</div>
 
-<!-- DASHBOARD -->
+<!-- ================= DASHBOARD ================= -->
+
 <div id="studentDash" style="display:none;">
-  <h3>STUDENT DASHBOARD</h3>
+  <h2>STUDENT DASHBOARD</h2>
+  <p>Welcome Student</p>
 </div>
 
 <div id="lecturerDash" style="display:none;">
-  <h3>LECTURER DASHBOARD</h3>
+  <h2>LECTURER DASHBOARD</h2>
+  <p>Welcome Lecturer</p>
 </div>
 
 <div id="advisorDash" style="display:none;">
-  <h3>ADVISOR DASHBOARD</h3>
+  <h2>ADVISOR DASHBOARD</h2>
+  <p>Welcome Advisor</p>
 </div>
 
 <script>
@@ -60,17 +66,19 @@ function login(){
   .then(res => res.json())
   .then(res => {
 
-    console.log(res);
-
     if(res.status == "success"){
-      document.getElementById("msg").innerHTML = "LOGIN SUCCESS";
 
-      // hide all
+      document.getElementById("msg").innerHTML = "";
+
+      // 🔥 HIDE LOGIN PAGE
+      document.getElementById("loginPage").style.display = "none";
+
+      // 🔥 HIDE ALL DASHBOARD FIRST
       document.getElementById("studentDash").style.display = "none";
       document.getElementById("lecturerDash").style.display = "none";
       document.getElementById("advisorDash").style.display = "none";
 
-      // show by role
+      // 🔥 SHOW BY ROLE
       if(res.role == "STUDENT"){
         document.getElementById("studentDash").style.display = "block";
       }
