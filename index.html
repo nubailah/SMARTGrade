@@ -1,210 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SMART Planner</title>
-
-<style>
-body{font-family:Segoe UI;margin:0;background:#eef2f7;}
-.header{background:#5f6bdc;color:white;padding:15px;text-align:center;}
-.container{padding:15px;}
-.card{background:white;padding:15px;border-radius:10px;margin-top:10px;}
-input,select,textarea{width:100%;padding:8px;margin:5px 0;}
-button{padding:10px;background:#5f6bdc;color:white;border:none;}
-table{width:100%;border-collapse:collapse;}
-td,th{border:1px solid #ccc;padding:6px;text-align:center;}
-</style>
+  <title>Login System</title>
 </head>
 
 <body>
 
-<div class="header">
-<h2>SMART Planner System</h2>
-</div>
+<h2>LOGIN SYSTEM</h2>
 
-<div class="container">
-
-<!-- LOGIN -->
-<div class="card">
-<h3>Login</h3>
-<input id="loginID">
-<button onclick="login()">Login</button>
-</div>
-
-<!-- LECTURER -->
-<div class="card" id="lecturer" style="display:none">
-
-<h3>Lecturer</h3>
-
-<h4>Add Student</h4>
-<input id="c" placeholder="Class">
-<input id="id" placeholder="ID">
-<input id="n" placeholder="Name">
-<input id="s" placeholder="Subject">
-<input id="a" placeholder="Advisor">
-<button onclick="addStudent()">Add</button>
-
-<hr>
-
-<h4>Load Students</h4>
-<input id="classF" placeholder="Class">
-<input id="subjectF" placeholder="Subject">
-<select id="assess">
-<option>Assess1</option>
-<option>Assess2</option>
-<option>Assess3</option>
-<option>Assess4</option>
+<select id="role">
+  <option value="Admin">Admin</option>
+  <option value="User">User</option>
 </select>
 
-<button onclick="loadStudents()">Load</button>
+<br><br>
 
-<table id="tbl"></table>
+<input id="id" placeholder="ID / No Gaji">
+<br><br>
 
+<input id="email" placeholder="Email / IC">
+<br><br>
+
+<button onclick="login()">Login</button>
+
+<p id="msg"></p>
+
+<!-- DASHBOARD -->
+<div id="adminDashboard" style="display:none;">
+  <h3>ADMIN DASHBOARD</h3>
 </div>
 
-<!-- ADVISOR -->
-<div class="card" id="advisor" style="display:none">
-<h3>Advisor</h3>
-<table id="tbl2"></table>
-</div>
-
+<div id="userDashboard" style="display:none;">
+  <h3>USER DASHBOARD</h3>
 </div>
 
 <script>
-
 const GAS_URL = "https://script.google.com/macros/s/AKfycbzTLMbTJBJvvXFYlXmmsV5uHk71n8HQZFl7PuJRJQdveYXlSwAEyOQmIn-owvuXtWzi/exec";
 
-let user={};
-
-// ================= LOGIN =================
 function login(){
-  fetch(GAS_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"login",
-      id:document.getElementById("loginID").value
-    })
+
+  let data = {
+    action: "login",
+    role: document.getElementById("role").value,
+    id: document.getElementById("id").value,
+    email: document.getElementById("email").value
+  };
+
+  fetch(GAS_URL, {
+    method: "POST",
+    body: JSON.stringify(data)
   })
-  .then(r=>r.json())
-  .then(res=>{
-    if(res.status!="ok") return alert("Fail login");
+  .then(res => res.json())
+  .then(res => {
 
-    user=res;
+    if(res.status == "success"){
+      document.getElementById("msg").innerHTML = "Login Success";
 
-    if(res.role=="Lecturer"){
-      document.getElementById("lecturer").style.display="block";
+      if(res.role == "Admin"){
+        document.getElementById("adminDashboard").style.display = "block";
+      }
+
+      if(res.role == "User"){
+        document.getElementById("userDashboard").style.display = "block";
+      }
+
+    } else {
+      document.getElementById("msg").innerHTML = "Login Failed";
     }
 
-    if(res.role=="Advisor"){
-      document.getElementById("advisor").style.display="block";
-      loadAdvisor();
-    }
-  });
-}
-
-// ================= ADD STUDENT =================
-function addStudent(){
-  fetch(GAS_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"addStudent",
-      class:document.getElementById("c").value,
-      id:document.getElementById("id").value,
-      name:document.getElementById("n").value,
-      subject:document.getElementById("s").value,
-      advisor:document.getElementById("a").value,
-      lecturer:user.name
-    })
-  }).then(r=>r.json()).then(()=>alert("Added"));
-}
-
-// ================= LOAD STUDENTS =================
-function loadStudents(){
-  fetch(GAS_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"loadStudents",
-      class:document.getElementById("classF").value,
-      subject:document.getElementById("subjectF").value,
-      assess:document.getElementById("assess").value
-    })
   })
-  .then(r=>r.json())
-  .then(res=>{
-    let tbl=document.getElementById("tbl");
-    tbl.innerHTML="<tr><th>Name</th><th>Target</th><th>Actual</th><th>Need</th><th>Response</th></tr>";
-
-    res.data.forEach(s=>{
-      let tr=document.createElement("tr");
-
-      tr.innerHTML=`
-        <td>${s.name}</td>
-        <td>${s.target}</td>
-        <td>${s.actual}</td>
-        <td><input type="checkbox" onchange="saveInt('${s.id}','${s.name}','${s.advisor}')"></td>
-        <td><input id="r_${s.id}"></td>
-      `;
-
-      tbl.appendChild(tr);
-    });
+  .catch(err => {
+    document.getElementById("msg").innerHTML = "Error connecting server";
+    console.log(err);
   });
 }
-
-// ================= SAVE INTERVENTION =================
-function saveInt(id,name,advisor){
-  fetch(GAS_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"saveIntervention",
-      id:id,
-      name:name,
-      assessment:document.getElementById("assess").value,
-      lecturerResponse:document.getElementById("r_"+id).value,
-      advisor:advisor
-    })
-  });
-}
-
-// ================= ADVISOR =================
-function loadAdvisor(){
-  fetch(GAS_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"getAdvisor",
-      name:user.name
-    })
-  })
-  .then(r=>r.json())
-  .then(res=>{
-    let tbl=document.getElementById("tbl2");
-    tbl.innerHTML="<tr><th>Student</th><th>Assessment</th><th>Lecturer</th><th>Advisor</th></tr>";
-
-    res.data.forEach(r=>{
-      let tr=document.createElement("tr");
-
-      tr.innerHTML=`
-        <td>${r.student}</td>
-        <td>${r.assessment}</td>
-        <td>${r.lecturer}</td>
-        <td><input onchange="update(${r.row},this.value)"></td>
-      `;
-
-      tbl.appendChild(tr);
-    });
-  });
-}
-
-function update(row,val){
-  fetch(GAS_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"updateAdvisor",
-      row:row,
-      value:val
-    })
-  });
-}
-
 </script>
 
 </body>
