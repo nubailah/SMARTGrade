@@ -1,134 +1,159 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Student eProfile System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Planner</title>
+
+<style>
+body{font-family:Arial;margin:0;background:#eef2f7}
+.header{background:#5f6bdc;color:white;padding:20px;text-align:center}
+.card{background:white;margin:10px;padding:15px;border-radius:10px}
+button{background:#5f6bdc;color:white;padding:10px;border:none;border-radius:6px}
+input,select,textarea{width:100%;padding:8px;margin:5px 0}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ccc;padding:6px;text-align:center}
+.nav button{margin:2px}
+</style>
 </head>
 
 <body>
 
-<!-- ================= LOGIN ================= -->
-<div id="loginPage">
-  <h2>LOGIN</h2>
-
-  <select id="role">
-    <option value="STUDENT">STUDENT</option>
-    <option value="LECTURER">LECTURER</option>
-    <option value="ADVISOR">ADVISOR</option>
-  </select>
-
-  <br><br>
-
-  <input id="id" placeholder="ID / No Gaji">
-  <br><br>
-
-  <input id="email" placeholder="Email / IC">
-  <br><br>
-
-  <button onclick="login()">LOGIN</button>
-
-  <p id="msg"></p>
+<div class="header">
+<h2>SMART PLANNER SYSTEM</h2>
 </div>
 
-<!-- ================= STUDENT DASHBOARD ================= -->
-<div id="studentDash" style="display:none;">
-  <h2>STUDENT ePROFILE</h2>
+<!-- LOGIN -->
+<div class="card" id="loginBox">
+<h3>LOGIN</h3>
 
-  <h3>📊 My Performance</h3>
-  <div id="studentData">Loading...</div>
+<select id="role">
+<option>STUDENT</option>
+<option>LECTURER</option>
+<option>ADVISOR</option>
+</select>
 
-  <h3>👨‍🏫 Advisor Info</h3>
-  <div>Advisor: (auto from system)</div>
+<input id="id" placeholder="ID">
+<input id="email" placeholder="Email">
+
+<button onclick="login()">LOGIN</button>
 </div>
 
-<!-- ================= LECTURER DASHBOARD ================= -->
-<div id="lecturerDash" style="display:none;">
-  <h2>LECTURER PANEL</h2>
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none">
 
-  <h3>📚 Manage Marks</h3>
-  <button>Add Marks</button>
-  <button>Update Marks</button>
-
-  <h3>📊 Class Performance</h3>
-  <div>Graph area (Chart.js nanti)</div>
+<div class="nav">
+<button onclick="show('student')">Student</button>
+<button onclick="show('lecturer')">Lecturer</button>
+<button onclick="show('advisor')">Advisor</button>
 </div>
 
-<!-- ================= ADVISOR DASHBOARD ================= -->
-<div id="advisorDash" style="display:none;">
-  <h2>ADVISOR PANEL</h2>
+<!-- STUDENT -->
+<div id="studentTab" class="card">
+<h3>STUDENT DASHBOARD</h3>
+<input id="sid">
+<button onclick="loadStudent()">Load</button>
+<div id="studentData"></div>
+</div>
 
-  <h3>🎯 My Students</h3>
-  <div id="advisorStudents">Loading...</div>
+<!-- LECTURER -->
+<div id="lecturerTab" class="card" style="display:none">
+<h3>LECTURER DASHBOARD</h3>
 
-  <h3>⚠ Intervention</h3>
-  <button>View At Risk Students</button>
+<input id="cls" placeholder="Class">
+<input id="sub" placeholder="Subject">
+
+<select id="ass">
+<option>A1</option>
+<option>A2</option>
+<option>A3</option>
+<option>A4</option>
+</select>
+
+<button onclick="loadLecturer()">Load</button>
+
+<table id="lecTable"></table>
+</div>
+
+<!-- ADVISOR -->
+<div id="advisorTab" class="card" style="display:none">
+<h3>ADVISOR DASHBOARD</h3>
+<button onclick="loadAdvisor()">Load Students</button>
+<div id="advisorData"></div>
+</div>
+
 </div>
 
 <script>
 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzTLMbTJBJvvXFYlXmmsV5uHk71n8HQZFl7PuJRJQdveYXlSwAEyOQmIn-owvuXtWzi/exec";
+let user={};
 
+// LOGIN
 function login(){
+  google.script.run.withSuccessHandler(res=>{
 
-  let data = {
-    action: "login",
-    role: document.getElementById("role").value,
-    id: document.getElementById("id").value,
-    email: document.getElementById("email").value
-  };
-
-  fetch(GAS_URL, {
-    method: "POST",
-    body: JSON.stringify(data)
-  })
-  .then(res => res.json())
-  .then(res => {
-
-    if(res.status == "success"){
-
-      document.getElementById("loginPage").style.display = "none";
-
-      // hide all dashboards
-      hideAll();
-
-      // ROLE CONTROL DASHBOARD
-      if(res.role == "STUDENT"){
-        document.getElementById("studentDash").style.display = "block";
-        loadStudentData(res.id);
-      }
-
-      if(res.role == "LECTURER"){
-        document.getElementById("lecturerDash").style.display = "block";
-      }
-
-      if(res.role == "ADVISOR"){
-        document.getElementById("advisorDash").style.display = "block";
-        loadAdvisorStudents(res.id);
-      }
-
-    } else {
-      document.getElementById("msg").innerHTML = "LOGIN FAILED";
+    if(res.status!="success"){
+      alert("Login failed");return;
     }
 
+    user=res;
+
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("dashboard").style.display="block";
+
+    if(user.role=="STUDENT") show("student");
+    if(user.role=="LECTURER") show("lecturer");
+    if(user.role=="ADVISOR") show("advisor");
+
+  }).login({
+    role:role.value,
+    id:id.value,
+    email:email.value
   });
-
 }
 
-function hideAll(){
-  document.getElementById("studentDash").style.display = "none";
-  document.getElementById("lecturerDash").style.display = "none";
-  document.getElementById("advisorDash").style.display = "none";
+// NAV
+function show(t){
+  studentTab.style.display="none";
+  lecturerTab.style.display="none";
+  advisorTab.style.display="none";
+
+  if(t=="student") studentTab.style.display="block";
+  if(t=="lecturer") lecturerTab.style.display="block";
+  if(t=="advisor") advisorTab.style.display="block";
 }
 
-// ================= OPTIONAL DATA LOAD =================
-
-function loadStudentData(id){
-  document.getElementById("studentData").innerHTML =
-    "Loading student data for ID: " + id;
+// STUDENT
+function loadStudent(){
+  google.script.run.withSuccessHandler(r=>{
+    studentData.innerHTML=JSON.stringify(r);
+  }).getStudentData(sid.value);
 }
 
-function loadAdvisorStudents(id){
-  document.getElementById("advisorStudents").innerHTML =
-    "Loading advisor students for: " + id;
+// LECTURER
+function loadLecturer(){
+  google.script.run.withSuccessHandler(data=>{
+    let t=document.getElementById("lecTable");
+
+    t.innerHTML=`<tr><th>ID</th><th>Name</th><th>Target</th><th>Actual</th></tr>`;
+
+    data.forEach(d=>{
+      t.innerHTML+=`
+      <tr>
+        <td>${d.studentID}</td>
+        <td>${d.studentName}</td>
+        <td>${d.target}</td>
+        <td>${d.actual}</td>
+      </tr>`;
+    });
+
+  }).getLecturerData(cls.value,sub.value,ass.value);
+}
+
+// ADVISOR
+function loadAdvisor(){
+  google.script.run.withSuccessHandler(d=>{
+    advisorData.innerHTML=JSON.stringify(d);
+  }).getAdvisorData(user.name);
 }
 
 </script>
